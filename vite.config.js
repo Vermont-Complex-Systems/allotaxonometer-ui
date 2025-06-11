@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [
     svelte({
       compilerOptions: {
-        runes: true
+        runes: true,
+        generate: 'server' // This is the key change!
       }
     })
   ],
@@ -18,12 +19,12 @@ export default defineConfig({
     },
     rollupOptions: {
       external: (id) => {
-        if (id.startsWith('svelte')) return true;
-        if (id === 'd3' || id.startsWith('d3/')) return true;
-        if (id === 'allotaxonometer' || id.startsWith('allotaxonometer/')) return true;
-        return false;
+        return id.startsWith('svelte') || 
+               id.startsWith('d3') || 
+               id === 'allotaxonometer';
       }
     },
-    target: 'esnext'
+    target: 'esnext',
+    minify: false
   }
 });
