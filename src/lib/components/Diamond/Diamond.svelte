@@ -27,9 +27,7 @@
                     
                     // Use a simple random selection instead of d3.shuffle during SSR
                     const types = filtered_dat[max_dist_idx]['types'].split(",");
-                    const name = typeof window !== 'undefined' 
-                        ? d3.shuffle(types)[0] 
-                        : types[0]; // Just take first during SSR
+                    const name = types[Math.floor(Math.random() * types.length)];
                     relevant_types.push(name);
                 }
             }

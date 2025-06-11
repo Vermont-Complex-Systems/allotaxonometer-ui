@@ -1,3 +1,5 @@
+export { Test } from './components/Test/index.js';
+
 // Main Dashboard
 export { Dashboard } from './components/Dashboard/index.js';
 
@@ -13,3 +15,4 @@ export type { DiamondProps } from './components/Diamond/index.js';
 export type { WordshiftProps } from './components/Wordshift/index.js';
 export type { DivergingBarChartProps } from './components/DivergingBarChart/index.js';
 export type { LegendProps } from './components/Legend/index.js';
+export type { TestProps } from './components/Test/index.js'; // Add this line

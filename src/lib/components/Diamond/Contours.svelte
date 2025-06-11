@@ -65,12 +65,7 @@
         return out;
     }
 
-    function get_contours(alpha, maxlog10) {
-        // Check if we're in browser environment
-        if (typeof window === 'undefined') {
-            return []; // Return empty array during SSR
-        }
-
+    function get_contours(alpha, maxlog10, rtd) {
         const Ninset = 10 ** 3;
         const tmpr1 = d3.range(0, 1000).map(d => Math.pow(10, d / 999 * 5));
         const tmpr2 = d3.range(0, 1000).map(d => Math.pow(10, d / 999 * 5));
@@ -99,7 +94,7 @@
     }
 
     // Only calculate contours in browser
-    let mycontours = $derived(get_contours(alpha, maxlog10));
+    let mycontours = $derived(get_contours(alpha, maxlog10, rtd));
     const x = $derived(d3.scaleLinear([0, maxlog10], [0, DiamondInnerHeight]));
     const y = $derived(d3.scaleLinear([maxlog10, 0], [DiamondInnerHeight, 0]));
 
