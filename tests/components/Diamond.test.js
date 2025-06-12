@@ -1,6 +1,6 @@
 import { render } from '@testing-library/svelte';
 import { Diamond } from '../../src/lib/index.js';
-import { testData } from '../fixtures/testData.js';
+import { testData } from '../fixtures/fakeData.js';
 
 test('Diamond component renders without crashing', () => {
   const { container } = render(Diamond, {

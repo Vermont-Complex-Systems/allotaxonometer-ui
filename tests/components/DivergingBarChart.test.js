@@ -1,6 +1,6 @@
 import { render } from '@testing-library/svelte';
 import { DivergingBarChart } from '../../src/lib/index.js';
-import { testData } from '../fixtures/testData.js';
+import { testData } from '../fixtures/fakeData.js';
 
 test('DivergingBarChart renders balance data', () => {
   const { container } = render(DivergingBarChart, {

@@ -18,19 +18,49 @@ describe('Full Pipeline Integration', () => {
   });
 
   const testData1 = [
-    { types: "apple", counts: 100, probs: 0.1 },
-    { types: "banana", counts: 80, probs: 0.08 },
-    { types: "cherry", counts: 60, probs: 0.06 },
-    { types: "date", counts: 40, probs: 0.04 },
-    { types: "elderberry", counts: 20, probs: 0.02 }
+    { types: "1", counts: 100, probs: 0.1 },
+    { types: "2", counts: 80, probs: 0.08 },
+    { types: "3", counts: 60, probs: 0.06 },
+    { types: "4", counts: 40, probs: 0.04 },
+    { types: "5", counts: 20, probs: 0.02 },
+    { types: "6", counts: 100, probs: 0.1 },
+    { types: "7", counts: 80, probs: 0.08 },
+    { types: "8", counts: 60, probs: 0.06 },
+    { types: "9", counts: 40, probs: 0.04 },
+    { types: "10", counts: 20, probs: 0.02 },
+    { types: "11", counts: 100, probs: 0.1 },
+    { types: "12", counts: 80, probs: 0.08 },
+    { types: "13", counts: 60, probs: 0.06 },
+    { types: "14", counts: 40, probs: 0.04 },
+    { types: "15", counts: 20, probs: 0.02 },
+    { types: "16", counts: 100, probs: 0.1 },
+    { types: "17", counts: 80, probs: 0.08 },
+    { types: "18", counts: 60, probs: 0.06 },
+    { types: "19", counts: 40, probs: 0.04 },
+    { types: "20", counts: 20, probs: 0.02 }
   ];
   
   const testData2 = [
-    { types: "apple", counts: 90, probs: 0.09 },
-    { types: "banana", counts: 110, probs: 0.11 },
-    { types: "cherry", counts: 50, probs: 0.05 },
-    { types: "fig", counts: 30, probs: 0.03 },
-    { types: "grape", counts: 25, probs: 0.025 }
+    { types: "1", counts: 90, probs: 0.09 },
+    { types: "2", counts: 110, probs: 0.11 },
+    { types: "21", counts: 50, probs: 0.05 },
+    { types: "4", counts: 30, probs: 0.03 },
+    { types: "22", counts: 25, probs: 0.025 },
+    { types: "2", counts: 90, probs: 0.09 },
+    { types: "3", counts: 110, probs: 0.11 },
+    { types: "5", counts: 50, probs: 0.05 },
+    { types: "7", counts: 30, probs: 0.03 },
+    { types: "10", counts: 25, probs: 0.025 },
+    { types: "11", counts: 90, probs: 0.09 },
+    { types: "12", counts: 110, probs: 0.11 },
+    { types: "18", counts: 50, probs: 0.05 },
+    { types: "19", counts: 30, probs: 0.03 },
+    { types: "6", counts: 25, probs: 0.025 },
+    { types: "13", counts: 90, probs: 0.09 },
+    { types: "15", counts: 110, probs: 0.11 },
+    { types: "14", counts: 50, probs: 0.05 },
+    { types: "17", counts: 30, probs: 0.03 },
+    { types: "18", counts: 25, probs: 0.025 }
   ];
 
   test('data processing pipeline completes successfully', () => {

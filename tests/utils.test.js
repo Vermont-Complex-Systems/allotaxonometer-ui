@@ -6,7 +6,7 @@ import {
   wordShift_dat, 
   balanceDat 
 } from '../dist/ssr/index.js';
-import { test_elem_1, test_elem_2 } from './fixtures/test_data.js';
+import { test_elem_1, test_elem_2 } from './fixtures/fakeData.js';
 
 describe('Utility Functions - Combine Distributions', () => {
   describe('combining two systems', () => {

@@ -1,4 +1,4 @@
-export const testData = {
+export const fakeData = {
   // Fake processed data object (from diamond_count)
   dat: {
     counts: [

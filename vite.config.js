@@ -6,7 +6,6 @@ export default defineConfig({
     svelte({
       compilerOptions: {
         runes: true,
-        // Explicitly set to client for tests
         dev: true
       }
     })
