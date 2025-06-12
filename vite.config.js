@@ -6,7 +6,8 @@ export default defineConfig({
     svelte({
       compilerOptions: {
         runes: true,
-        generate: 'server' // This is the key change!
+        // Explicitly set to client for tests
+        dev: true
       }
     })
   ],
@@ -26,5 +27,16 @@ export default defineConfig({
     },
     target: 'esnext',
     minify: false
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./tests/setup.js'],
+    include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}', 'tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    // Add this to ensure proper Svelte compilation for tests
+    alias: {
+      // Make sure we're using the client build of Svelte
+      'svelte': 'svelte'
+    }
   }
 });

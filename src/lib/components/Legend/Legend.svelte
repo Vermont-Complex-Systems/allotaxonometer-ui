@@ -1,27 +1,31 @@
 <script>
+    import { scaleOrdinal, range, interpolateInferno, scaleBand, max, rgb, scaleLog } from "d3";
     
-    import { scaleOrdinal, range, interpolateInferno, scaleBand, max, rgb, descending, scaleLog } from "d3";
-    let { diamond_dat, DiamondHeight } = $props();
+    let { 
+        diamond_dat, 
+        DiamondHeight,
+        max_count_log // Add this as a prop to match D3 version
+    } = $props();
 
-    const N_CATEGO = 20
-    const myramp = range(N_CATEGO).map(i => rgb(interpolateInferno(i / (N_CATEGO - 1))).hex())
-    const color = scaleOrdinal(range(N_CATEGO), myramp)
+    const N_CATEGO = 20;
+    const myramp = range(N_CATEGO).map(i => rgb(interpolateInferno(i / (N_CATEGO - 1))).hex());
+    const color = scaleOrdinal(range(N_CATEGO), myramp);
 
     let height = 370;
-
-    const margin = {  right: 40, top: 65, left: 10 };
+    const margin = { right: 40, top: 65, left: 10 };
     
     let innerHeight = $derived(height - margin.top - margin.right);   
     let max_rank = $derived(max(diamond_dat, (d) => d.rank_L[1]));
 
     let y = $derived(scaleBand().domain(color.domain().reverse()).rangeRound([0, innerHeight]));
-
-    let logY = $derived(scaleLog().domain([1, 10**Math.ceil(Math.max(Math.log10(max_rank))-1)]).rangeRound([0, innerHeight]).nice());
+    
+    // Use max_count_log if provided, otherwise calculate from data
+    let logDomain = $derived(max_count_log || 10**Math.ceil(Math.log10(max_rank)-1));
+    let logY = $derived(scaleLog().domain([1, logDomain]).rangeRound([0, innerHeight]).nice());
 
     let logFormat10 = $derived(logY.tickFormat());
-    let yTicks = $derived(logY.ticks())
+    let yTicks = $derived(logY.ticks());
 </script>
-    
     
     <g class="legend-container" transform="translate({margin.left}, {DiamondHeight-margin.top})">
       {#each color.domain() as d}

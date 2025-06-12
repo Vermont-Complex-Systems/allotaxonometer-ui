@@ -1,7 +1,7 @@
 <script>
     import * as d3 from "d3";
 
-    let { alpha, maxlog10, rtd, DiamondInnerHeight } = $props();
+    let { alpha, maxlog10, divnorm, DiamondInnerHeight } = $props(); 
 
     function alpha_norm_type2(x1, x2, alpha) {
         if (alpha == 0) {
@@ -15,13 +15,13 @@
         }
     }
 
-    function make_grid(Ninset, tmpr1, tmpr2, alpha, rtd) {
+    function make_grid(Ninset, tmpr1, tmpr2, alpha, divnorm) {
         const deltamatrix = Array.from({ length: Ninset }, () => Array(Ninset).fill(0));
 
         for (let i = 0; i < Ninset; i++) {
             for (let j = 0; j < Ninset; j++) {
                 const divElem = alpha_norm_type2(1 / tmpr1[i], 1 / tmpr2[j], alpha);
-                deltamatrix[i][j] = divElem / rtd.normalization; 
+                deltamatrix[i][j] = divElem / divnorm; 
             }
 
             deltamatrix[i][i] = -1;
@@ -65,7 +65,7 @@
         return out;
     }
 
-    function get_contours(alpha, maxlog10, rtd) {
+    function get_contours(alpha, maxlog10, divnorm) {
         const Ninset = 10 ** 3;
         const tmpr1 = d3.range(0, 1000).map(d => Math.pow(10, d / 999 * 5));
         const tmpr2 = d3.range(0, 1000).map(d => Math.pow(10, d / 999 * 5));
@@ -76,7 +76,7 @@
             .range([1, tmpr1.length]);
         
         const contour_indices = d3.range(Ncontours + 2).map(i => Math.round(scale(i)));
-        const grid = make_grid(Ninset, tmpr1, tmpr2, alpha, rtd);
+        const grid = make_grid(Ninset, tmpr1, tmpr2, alpha, divnorm);
         const indices = contour_indices.slice(1, -1);
         const lastRow = grid[grid.length - 1];
         const heights = indices.map(index => lastRow[index]);
@@ -94,7 +94,7 @@
     }
 
     // Only calculate contours in browser
-    let mycontours = $derived(get_contours(alpha, maxlog10, rtd));
+    let mycontours = $derived(get_contours(alpha, maxlog10, divnorm));
     const x = $derived(d3.scaleLinear([0, maxlog10], [0, DiamondInnerHeight]));
     const y = $derived(d3.scaleLinear([maxlog10, 0], [DiamondInnerHeight, 0]));
 

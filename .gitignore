@@ -3,4 +3,7 @@ node_modules/
 dist/
 package-lock.json
 .DS_Store
-src/lib/components/Test/Test.svelte
+src/lib/components/Test/
+*Old.js
+src/lib/utils/indexOld.ts
+test-output/

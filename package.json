@@ -38,20 +38,29 @@
     "url": "https://github.com/Vermont-Complex-Systems/allotaxonometer-ui/issues"
   },
   "peerDependencies": {
-    "svelte": "^5.0.0",
-    "d3": "^7.0.0",
+    "@ungap/structured-clone": "1.3.0",
     "allotaxonometer": "1.1.11",
-    "@ungap/structured-clone": "1.3.0"
+    "d3": "^7.0.0",
+    "svelte": "^5.0.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/svelte": "^5.2.8",
+    "jsdom": "^26.1.0",
     "svelte": "^5.0.0",
     "typescript": "^5.0.0",
-    "vite": "^5.0.3"
+    "vite": "^5.0.3",
+    "vitest": "^3.2.3"
   },
   "scripts": {
     "build": "vite build",
     "build:ssr": "vite build --config vite.ssr.config.js",
-    "build:all": "npm run build && npm run build:ssr"
+    "build:all": "npm run build && npm run build:ssr",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ssr": "npm run build:ssr && vitest run tests/ssr.test.js",
+    "test:legend": "vitest run tests/Legend.test.js",
+    "prepublishOnly": "npm run build:all"
   }
 }

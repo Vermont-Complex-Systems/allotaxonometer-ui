@@ -6,25 +6,26 @@
   import Legend from '../Legend/Legend.svelte';
 
   interface DashboardProps {
-    // Data props
-    diamond_count?: any[];
-    diamond_dat?: any[];
+    // Updated data props (new API)
+    dat?: any;                    // Main data object containing counts, deltas, etc.
+    alpha?: number;
+    divnorm?: number;             // Replaces rtd
     barData?: any[];
-    test_elem_1?: any;
-    test_elem_2?: any;
+    balanceData?: any[];          // Pre-calculated balance data
     
     // Configuration props
+    title?: string[];
+    maxlog10?: number;
     height?: number;
     width?: number;
+    DashboardHeight?: number;
+    DashboardWidth?: number;
     DiamondHeight?: number;
     DiamondWidth?: number;
-    DiamondInnerHeight?: number;
-    margin?: { inner: number; diamond: number };
-    trueDiamondHeight?: number;
-    alpha?: number;
-    maxlog10?: number;
-    rtd?: any;
-    title?: string[];
+    marginInner?: number;         // Replaces margin.inner
+    marginDiamond?: number;       // Replaces margin.diamond
+    max_count_log?: number;       // For legend
+    xDomain?: [number, number]; // Optional x-axis domain for Wordshift
     
     // Style props
     class?: string;
@@ -38,22 +39,23 @@
   }
 
   let {
-    diamond_count = [],
-    diamond_dat = [],
+    dat = null,
+    alpha = 0.58,
+    divnorm = 1,
     barData = [],
-    test_elem_1 = null,
-    test_elem_2 = null,
+    balanceData = [],
+    xDomain = undefined,  // Add this prop
+    title = ['System 1', 'System 2'],
+    maxlog10 = 0,
     height = 815,
     width = 1200,
+    DashboardHeight = 815,    // Add these
+    DashboardWidth = 1200,     // Add these
     DiamondHeight = 600,
     DiamondWidth = 600,
-    DiamondInnerHeight = 440,
-    margin = { inner: 160, diamond: 40 },
-    trueDiamondHeight = 400,
-    alpha = 0.58,
-    maxlog10 = 0,
-    rtd = null,
-    title = ['System 1', 'System 2'],
+    marginInner = 160,
+    marginDiamond = 40,
+    max_count_log = undefined,
     class: className = '',
     style = '',
     showDiamond = true,
@@ -62,45 +64,55 @@
     showLegend = true,
     ...restProps
   }: DashboardProps = $props();
+  
+  let max_shift = $derived(
+    barData.length > 0 
+      ? Math.max(...barData.map(d => Math.abs(d.metric))) 
+      : 1
+  );
+
+  let wordshiftXDomain = $derived(xDomain || [-max_shift * 1.5, max_shift * 1.5]);
 </script>
 
 <div class="allotaxonometer-dashboard {className}" {style} {...restProps}>
   <svg id="allotaxonometer-svg" {height} {width}>
-    {#if showDiamond}
+    {#if showDiamond && dat}
       <Diamond 
-        {diamond_count} 
-        {diamond_dat} 
-        {DiamondInnerHeight} 
-        {margin} 
-        {trueDiamondHeight} 
-        {alpha} 
-        {maxlog10} 
-        {rtd} 
+        {dat}
+        {alpha}
+        {divnorm}
         {title}
+        {maxlog10}
+        {DiamondHeight}
+        {marginInner}
+        {marginDiamond}
       />
     {/if}
     
-    {#if showWordshift}
+    {#if showWordshift && barData.length > 0}
       <Wordshift 
         {barData} 
-        DashboardHeight={height} 
-        DashboardWidth={width}
+        {DashboardHeight}
+        {DashboardWidth}
+        xDomain={wordshiftXDomain}
+        width={640}
+        marginLeft={140}
       />
     {/if}
     
-    {#if showDivergingBar}
+    {#if showDivergingBar && balanceData.length > 0}
       <DivergingBarChart 
-        {test_elem_1} 
-        {test_elem_2} 
+        data={balanceData}
         {DiamondHeight} 
         {DiamondWidth} 
       />
     {/if}
     
-    {#if showLegend}
+    {#if showLegend && dat}
       <Legend 
-        {diamond_dat} 
+        diamond_dat={dat.counts}
         {DiamondHeight}
+        {max_count_log}
       />
     {/if}
   </svg>
