@@ -48,7 +48,6 @@ export const axisStyles = {
     fontFamily: fonts.family,
     fontSize: fonts.sizes.sm,
     fill: colors.darkergrey,
-    textAnchor: "end"
   }),
   
   helperText: () => style({

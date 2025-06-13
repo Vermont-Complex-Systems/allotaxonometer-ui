@@ -3,8 +3,10 @@
     
     let { innerHeight, scale, title } = $props();
     
-    let logFormat10 = scale.tickFormat();
-    let yTicks = $derived(scale.ticks());
+    let logFormat10 = $derived(scale.tickFormat());
+    let yTicks = $derived(
+    scale.ticks().filter(t => t >= 1 && Number.isInteger(Math.log10(t)))
+    );
 </script>
 
 <g class='axis y' transform="translate({innerHeight}, 0) scale(-1, 1)">
@@ -13,7 +15,7 @@
             <line x1="0" x2="-6" y1="0" y2="0" style={axisStyles.tickLine()}></line>
         </g>
         <g transform="translate(0, {scale(tick)}) rotate(45)">
-            <text dx="-10" dy="10" style={axisStyles.tickLabel()}>{logFormat10(tick)}</text>
+            <text dx="-5" dy="13"  text-anchor="end" style={axisStyles.tickLabel()}>{logFormat10(tick)}</text>
         </g>
     {/each}
 
