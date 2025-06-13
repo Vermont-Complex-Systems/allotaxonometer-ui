@@ -4,6 +4,8 @@
   import DivergingBarChart from '../DivergingBarChart/DivergingBarChart.svelte';
   import Legend from '../Legend/Legend.svelte';
 
+  import { dashboardStyles } from '../../styles/styleHelpers.js';
+
   interface DashboardProps {
     // Updated data props (new API)
     dat?: any;                    // Main data object containing counts, deltas, etc.
@@ -67,7 +69,7 @@
     showLegend = true,
     ...restProps
   }: DashboardProps = $props();
-  
+
   let max_shift = $derived(
     barData.length > 0 
       ? Math.max(...barData.map(d => Math.abs(d.metric))) 
@@ -80,22 +82,20 @@
 
 
 <div class="allotaxonometer-dashboard" style="position: relative; margin: 0; padding: 0;">
-  <!-- Instrument and Alpha, absolutely positioned -->
-  <div class="allo-fonts" style="position: absolute; top: 12%; left: 5.5%; font-size: 14px;">{instrumentText}</div>
-  <div class="allo-fonts" style="position: absolute; top: 14.5%; left: 5.5%; font-size: 14px;">α = {alpha}</div>
-
-  <!-- FLEX layout for diamond/legend/wordshift -->
   <div style="display:flex; flex-wrap: wrap; align-items:center; justify-content: center; row-gap: 50px;">
-    <div style="margin-top:60px">
-      <!-- Titles with exact same styling -->
-      <div style="display:flex; gap: 10em; justify-content: center; font-size: 16px; margin-bottom: -70px; margin-right: 70px;">
-          <div class="allo-fonts">{title[0]}</div>
-          <div class="allo-fonts">{title[1]}</div>
+    <div style="margin-top:20px">
+      <!-- Titles with instrument text positioned relative to left title -->
+      <div style="display:flex; gap: 10em; justify-content: center; margin-bottom: -70px; margin-right: 70px; position: relative;">
+          <div style="position: relative;">
+            <div style={dashboardStyles.title()}>{title[0]}</div>
+            <!-- Instrument text positioned at far left edge -->
+            <div style="position: absolute; top: 100%; left: -12em; margin-top: 2.5em; {dashboardStyles.instrumentText()}">{instrumentText}</div>
+            <div style="position: absolute; top: 100%; left: -12em; margin-top: 3.5em; {dashboardStyles.alphaText()}">α = {alpha}</div>
+          </div>
+          <div style={dashboardStyles.title()}>{title[1]}</div>
       </div>
       
-      <!-- Diamond plot - NO explicit width/height, just like original -->
-      <div id="diamondplot" >
-          <svg xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="diamondplot">
             <Diamond 
               {dat} {alpha} {divnorm} {title} {maxlog10} 
               {DiamondHeight} {marginInner} {marginDiamond}
@@ -105,7 +105,6 @@
       <!-- FLEX Legend and balance plot -->
       <div style="display: flex; gap: 13em; justify-content: center;">
         <div id="legend" style="margin-left: -50px;">
-            <svg xmlns="http://www.w3.org/2000/svg"></svg>
               <Legend 
                 diamond_dat={dat.counts}
                 DiamondHeight={DiamondHeight}
@@ -113,7 +112,6 @@
               />
         </div>
         <div id="balance">
-          <svg xmlns="http://www.w3.org/2000/svg"></svg>
               <DivergingBarChart 
                 data={balanceData}
                 DiamondHeight={DiamondHeight} 
@@ -126,7 +124,6 @@
     <!-- Wordshift -->
     <div style="margin-top:60px; overflow: visible;">
       <div id="wordshift" style="overflow: visible;">
-         <svg xmlns="http://www.w3.org/2000/svg"></svg>
             <Wordshift 
               barData={barData} 
               DashboardHeight={DashboardHeight}

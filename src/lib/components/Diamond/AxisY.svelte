@@ -1,65 +1,29 @@
 <script>
-	let { height, scale, title } = $props();
-	
-	let logFormat10 = scale.tickFormat();
+    import { axisStyles } from '../../styles/styleHelpers.js';
+    
+    let { innerHeight, scale, title } = $props();
+    
+    let logFormat10 = scale.tickFormat();
     let yTicks = $derived(scale.ticks());
 </script>
 
-<g class='axis y' transform="translate({height}, 0) scale(-1, 1)">
+<g class='axis y' transform="translate({innerHeight}, 0) scale(-1, 1)">
     {#each yTicks as tick, index}
-        <g class="ytick" transform="translate(0, {scale(tick)})">
-            <line 
-				class="tick-line"
-				x1="0" 
-				x2="-6" 
-				y1="0" 
-				y2="0"
-            ></line>
+        <g transform="translate(0, {scale(tick)})">
+            <line x1="0" x2="-6" y1="0" y2="0" style={axisStyles.tickLine()}></line>
         </g>
-        <g class="tick-text" transform="translate(0, {scale(tick)}) rotate(45)">
-            <text class="axis-tick-label" dx="-23" dy="10">{logFormat10(tick)}</text>
+        <g transform="translate(0, {scale(tick)}) rotate(45)">
+            <text dx="-10" dy="10" style={axisStyles.tickLabel()}>{logFormat10(tick)}</text>
         </g>
     {/each}
-	<g class="ylab" transform="rotate(90)">
-		<text class="axis-label" dy="45" x={height/2}>Rank r</text>
-		<text class="axis-label" dy="63" x={height/2}>for</text>
-		<text class="axis-label" dy="80" x={height/2}>{title[0]}</text>
-		<text class="axis-helper-text" dy="60" x={height-40}>more →</text>
-		<text class="axis-helper-text" dy="75" x={height-40}>frequent</text>
-		<text class="axis-helper-text" dy="60" x={40}>← less</text>
-		<text class="axis-helper-text" dy="75" x={40}>frequent</text>
-	</g>
-</g>
 
-<style>
-	.axis.y {
-		font-family: var(--allo-font-family);
-	}
-	
-	.tick-line {
-		stroke: var(--allo-darkgrey);
-	}
-	
-	.axis-tick-label {
-		font-family: var(--allo-font-family);
-		font-size: 12px;
-		fill: var(--allo-darkergrey);
-		text-anchor: end;
-	}
-	
-	.axis-label {
-		font-family: var(--allo-font-family);
-		font-size: 14px;
-		fill: var(--allo-darkergrey);
-		text-anchor: middle;
-		opacity: 0.7;
-	}
-	
-	.axis-helper-text {
-		font-family: var(--allo-font-family);
-		font-size: 12px;
-		fill: var(--allo-darkgrey);
-		text-anchor: middle;
-		opacity: 0.7;
-	}
-</style>
+    <g class="ylab" transform="rotate(90)">
+        <text x={innerHeight/2} dy="45" style={axisStyles.label()}>Rank r</text>
+        <text x={innerHeight/2} dy="63" style={axisStyles.label()}>for</text>
+        <text x={innerHeight/2} dy="80" style={axisStyles.label()}>{title[0]}</text>
+        <text x={innerHeight-40} dy="60" style={axisStyles.helperText()}>less →</text>
+        <text x={innerHeight-40} dy="75" style={axisStyles.helperText()}>frequent</text>
+        <text x={40} dy="60" style={axisStyles.helperText()}>← more</text>
+        <text x={40} dy="75" style={axisStyles.helperText()}>frequent</text>
+    </g>
+</g>

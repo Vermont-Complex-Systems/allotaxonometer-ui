@@ -1,27 +1,26 @@
 <script>
     import * as d3 from "d3";
-    
+    import { wordshiftStyles } from '../../styles/styleHelpers.js';
+
     let { 
         barData, 
-        DashboardHeight, 
-        DashboardWidth,
         x = d => d.metric,
         y = d => d.type,
         xDomain,
-        marginTop = 30,
-        marginRight = 40,
-        marginBottom = 10,
-        marginLeft = 40,
-        width = 300,
-        height = 680,
+        marginTop = 50,
+        marginRight = 60,
+        marginBottom = 40,
+        marginLeft = 70,
+        width = 360,
+        height,
         xFormat = '%',
         xLabel = '← System 1 · Divergence contribution · System 2 →',
-        yPadding = 0.2,
+        yPadding = 0,
         colors = ['lightgrey', 'lightblue'],
-        barHeightFactor = 0.8
+        barHeightFactor = 0.7
     } = $props();
     
-    // Compute values (matching D3 version)
+    // Compute values (matching D3 version exactly)
     let X = $derived(d3.map(barData, x));
     let Y = $derived(d3.map(barData, y));
     
@@ -29,10 +28,19 @@
     let computedXDomain = $derived(xDomain || d3.extent(X));
     let yDomain = $derived(new d3.InternSet(Y));
     
-    // Compute dimensions
-    let xRange = $derived([marginLeft, width - marginRight]);
-    let computedHeight = $derived(Math.ceil((yDomain.size + yPadding) * 25) + marginTop + marginBottom);
-    let yRange = $derived([marginTop, computedHeight - marginBottom]);
+    // Match D3 dimensions exactly
+    const xAxisYOffset = 10; // Space below x-axis (from original)
+    const bandHeight = 23;   // Fixed band height (from original)
+    const shiftSvgBy = 18;   // shift svg up to align with system titles
+    
+    let compactHeight = $derived(yDomain.size * bandHeight);
+    let innerWidth = $derived(width - marginLeft - marginRight);
+    let innerHeight = $derived(compactHeight + xAxisYOffset);
+    let computedHeight = $derived(innerHeight + marginTop + marginBottom);
+    
+    // Compute ranges exactly like D3
+    let xRange = $derived([0, innerWidth]);
+    let yRange = $derived([xAxisYOffset, xAxisYOffset + compactHeight]);
     
     // Filter indices and create lookup
     let I = $derived(d3.range(X.length).filter(i => yDomain.has(Y[i])));
@@ -62,7 +70,7 @@
         return { name_y, numbers_y };
     }
 
-    let finalHeight = $derived(height || (computedHeight + marginTop + marginBottom));
+    let finalHeight = $derived(height || computedHeight);
 </script>
 
 <svg 
@@ -71,88 +79,84 @@
     viewBox="0 0 {width} {finalHeight}"
     style="overflow: visible; display: block;"
 >
-<g class='wordshift-container'>
-    <!-- X-axis with grid lines -->
-    <g class='wordshift-axis x' transform="translate(0, {marginTop})">
-        {#each xTicks as tick}
-            <g class="wordshift-tick">
+    <!-- Main wrapper transform matching D3 exactly -->
+    <g class='wordshift-container' transform="translate({marginLeft}, {marginTop - shiftSvgBy})">
+        <!-- X-axis with grid lines -->
+        <!-- X-axis with ticks and grid lines -->
+        <g class='wordshift-axis x' transform="translate(0, {xAxisYOffset})">
+            {#each xTicks as tick}
+                <!-- Original tick marks (short) -->
+                <line 
+                    x1={xScale(tick)} 
+                    y1="0" 
+                    x2={xScale(tick)}
+                    y2="6"
+                    style="stroke: currentColor; stroke-width: 1;"
+                />
+                <!-- Extended grid lines (cloned effect) -->
                 <line 
                     class="wordshift-grid-line"
                     x1={xScale(tick)} 
                     y1="0" 
                     x2={xScale(tick)}
-                    y2={computedHeight - marginTop - marginBottom} 
-                    stroke="currentColor"
-                    stroke-opacity="0.1"
+                    y2={innerHeight - xAxisYOffset} 
+                    style={tick === 0 ? "stroke: rgb(38, 38, 38); stroke-width: 1; stroke-opacity: 0.8;" : wordshiftStyles.gridLine()}
                 />
+                <!-- Tick labels -->
                 <text 
-                    class="wordshift-tick-label"
                     x={xScale(tick)} 
                     y="-12" 
                     text-anchor="middle"
-                    font-family="EB Garamond, serif"
-                    font-size="14"
-                    fill="#333"
+                    style={wordshiftStyles.tickLabel()}
                 >{format(tick)}</text>
-            </g>
+            {/each}
+            
+            <!-- X-axis label -->
+            <text 
+                x={xScale(0)} 
+                y="-35" 
+                style={wordshiftStyles.axisTitle()}
+            >{xLabel}</text>
+        </g>
+        
+        <!-- Bars -->
+        {#each I as i}
+            <rect
+                class="wordshift-bar"
+                x={Math.min(xScale(0), xScale(X[i]))}
+                y={yScale(Y[i]) + (yScale.bandwidth() - yScale.bandwidth() * barHeightFactor) / 2}
+                fill={colors[X[i] > 0 ? colors.length - 1 : 0]}
+                width={Math.abs(xScale(X[i]) - xScale(0))}
+                height={yScale.bandwidth() * barHeightFactor}
+                style="mix-blend-mode: multiply;" 
+            />
         {/each}
         
-        <!-- X-axis label - centered on zero line like D3 version -->
-        <text 
-            class="wordshift-axis-title"
-            x={xScale(0)} 
-            y="-35" 
-            text-anchor="middle"
-            font-family="EB Garamond, serif"
-            font-size="16"
-            fill="#333"
-        >{xLabel}</text>
-    </g>
-    
-    <!-- Bars -->
-    {#each I as i}
-        <rect
-            class="wordshift-bar"
-            x={Math.min(xScale(0), xScale(X[i]))}
-            y={yScale(Y[i]) + (yScale.bandwidth() - yScale.bandwidth() * barHeightFactor) / 2}
-            fill={colors[X[i] > 0 ? colors.length - 1 : 0]}
-            width={Math.abs(xScale(X[i]) - xScale(0))}
-            height={yScale.bandwidth() * barHeightFactor}
-        />
-    {/each}
-    
-    <!-- Y-axis labels with names and numbers -->
-    <g class="wordshift-y-axis" transform="translate({xScale(0)}, 0)">
-        {#each yScale.domain() as label}
-            {@const labelData = parseLabelData(label)}
-            {@const xValue = YX.get(label)}
-            <g class="wordshift-label-group" transform="translate(0, {yScale(label) + yScale.bandwidth() / 2})">
-                <!-- Name text on the normal side (matching D3 positioning) -->
-                <text 
-                    class="wordshift-name-label"
-                    x={xValue > 0 ? 6 : -6}
-                    dy="0.32em"
-                    text-anchor={xValue > 0 ? "start" : "end"}
-                    font-family="EB Garamond, serif"
-                    font-size="14"
-                    fill="#333"
-                >{labelData.name_y}</text>
-                
-                <!-- Numbers text on the opposite side (matching D3 positioning) -->
-                {#if labelData.numbers_y}
+        <!-- Y-axis labels with names and numbers -->
+        <g class="wordshift-y-axis" transform="translate({xScale(0)}, 0)">
+            {#each yScale.domain() as label}
+                {@const labelData = parseLabelData(label)}
+                {@const xValue = YX.get(label)}
+                <g class="wordshift-label-group" transform="translate(0, {yScale(label) + yScale.bandwidth() / 2})">
+                    <!-- Name text on the normal side (matching D3 positioning) -->
                     <text 
-                        class="wordshift-numbers-label"
-                        x={xValue > 0 ? -6 : 6}
+                        x={xValue > 0 ? 6 : -6}
                         dy="0.32em"
-                        text-anchor={xValue > 0 ? "end" : "start"}
-                        font-family="EB Garamond, serif"
-                        font-size="14"
-                        fill="#666"
-                        opacity="0.7"
-                    >{labelData.numbers_y}</text>
-                {/if}
-            </g>
-        {/each}
+                        text-anchor={xValue > 0 ? "start" : "end"}
+                        style={wordshiftStyles.nameLabel()}
+                    >{labelData.name_y}</text>
+                    
+                    <!-- Numbers text on the opposite side (matching D3 positioning) -->
+                    {#if labelData.numbers_y}
+                        <text 
+                            x={xValue > 0 ? -6 : 6}
+                            dy="0.32em"
+                            text-anchor={xValue > 0 ? "end" : "start"}
+                            style={wordshiftStyles.numbersLabel()}
+                        >{labelData.numbers_y}</text>
+                    {/if}
+                </g>
+            {/each}
+        </g>
     </g>
-</g>
 </svg>

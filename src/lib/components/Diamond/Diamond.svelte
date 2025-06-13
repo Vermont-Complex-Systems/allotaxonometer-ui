@@ -4,6 +4,7 @@
     import AxisY from './AxisY.svelte';
     import Grid from './Grid.svelte';
     import Contours from './Contours.svelte';
+    import { diamondStyles } from '../../styles/styleHelpers.js';
 
     let { 
         dat, 
@@ -84,9 +85,7 @@
     viewBox="0 0 {DiamondHeight} {DiamondHeight}"
     style="overflow: visible; display: block;"
     transform="scale(-1,1) rotate(45) translate({innerHeight/4}, {innerHeight/4})"
->
-    <!-- Remove the g wrapper and put content directly in SVG -->
-    
+>   
     <!-- Background polygons with correct colors - order matters! -->
     <polygon 
         class="diamond-background grey-triangle"
@@ -105,8 +104,8 @@
         stroke-width="0.5"
     />
 
-    <AxisX height={innerHeight} scale={logScale} {title}/>
-    <AxisY height={innerHeight} scale={logScale} {title}/>
+    <AxisX {innerHeight} scale={logScale} {title} />
+    <AxisY {innerHeight} scale={logScale} {title}/>
     <Grid height={innerHeight} {wxy} {ncells} scale={linScale}></Grid>
 
     <!-- Base layer: Heatmap cells with fill, NO stroke -->
@@ -122,59 +121,36 @@
         />
     {/each}
 
-    <!-- Overlay layer: Stroke-only rects (placed on top) -->
+     <!-- Overlay layer: Stroke-only rects -->
     {#each diamond_dat as d}
         <rect
-            class="diamond-cell-heat"
             x={xy(d.x1)}
             y={xy(d.y1)}
             width={xy.bandwidth()}
             height={xy.bandwidth()}
-            fill={d.value === 0 ? "none" : color_scale(d.value)}
+            fill={d.value > 0 ? color_scale(d.value): "none"}
+            style={d.value > 0 ? diamondStyles.cellStroke() : ''}
         />
     {/each}
 
-    <!-- Text labels with correct positioning -->
+    <!-- Text labels -->
     {#each diamond_dat.filter(d => filter_labs(d, relevant_types)) as d}
         <text
-            class="diamond-label"
             x={xy(d.x1)}
             y={Number.isInteger(d.coord_on_diag) ? xy(d.y1) : xy(d.y1)-1}
             dx={d.x1 - d.y1 <= 0 ? 5 : -5}
             dy="5"
             text-anchor={d.x1 - d.y1 <= 0 ? "start" : "end"}
             transform="scale(1,-1) rotate(-90) rotate(-45, {xy(d.x1)}, {xy(d.y1)}) translate({d.which_sys === "right" ? xy(Math.sqrt(d.cos_dist))*1.5 : -xy(Math.sqrt(d.cos_dist))*1.5}, 0)"
+            style={diamondStyles.label()}
         >{d.types.split(",")[0]}</text>
     {/each}
-
     <!-- Middle diagonal line -->
     <line 
-        class="diamond-middle-line"
-        x1="0"
-        y1="0" 
-        x2={innerHeight-7}
-        y2={innerHeight-7}
-        stroke="rgb(38, 38, 38)"
-        stroke-width="0.5"
+        x1="0" y1="0" 
+        x2={innerHeight-7} y2={innerHeight-7}
+        style={diamondStyles.middleLine()}
     />
 
     <Contours {alpha} {maxlog10} {divnorm} DiamondInnerHeight={innerHeight}></Contours>
 </svg>
-
-<style>
-  .diamond-chart {
-    font-family: "EB Garamond", "Garamond", "Century Schoolbook L", serif;
-    overflow: visible;
-  }
-  
-  .diamond-label {
-    font-family: "EB Garamond", "Garamond", "Century Schoolbook L", serif;
-    font-size: 12px;
-    fill: rgb(89, 89, 89);
-  }
-
-  .diamond-middle-line {
-    stroke: rgb(38, 38, 38);
-    stroke-width: 0.5;
-  }
-</style>

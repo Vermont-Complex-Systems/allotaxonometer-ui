@@ -1,5 +1,6 @@
 <script>
     import { scaleBand, rollup, range, InternSet, scaleLinear, extent, map } from "d3";
+        import { balanceStyles } from '../../styles/styleHelpers.js';
     
     let { 
         data,
@@ -64,6 +65,7 @@
                 font-size="10"
                 font-family="EB Garamond, serif"
                 text-anchor={X[i] < 0 ? "end" : "start"}
+                style={balanceStyles.valueLabel()}
             >{format(Math.abs(X[i]))}</text>
         {/each}
         
@@ -74,18 +76,11 @@
                     x="0"
                     y={yScale(label) + yScale.bandwidth() / 2}
                     dy="0.35em"
-                    font-size="10"
-                    font-family="EB Garamond, serif"
                     text-anchor="middle"
                     opacity={YX.get(label) ? "0.5" : "1"}
+                    style={balanceStyles.yLabel()}
                 >{label}</text>
             {/each}
         </g>
     </g>
 </svg>
-
-<style>
-    .balance-chart {
-        font-family: "EB Garamond", "Garamond", "Century Schoolbook L", serif;
-    }
-</style>
