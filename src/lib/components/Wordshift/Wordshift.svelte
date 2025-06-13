@@ -30,8 +30,9 @@
     
     // Match D3 dimensions exactly
     const xAxisYOffset = 10; // Space below x-axis (from original)
-    const bandHeight = 23;   // Fixed band height (from original)
-    const shiftSvgBy = 18;   // shift svg up to align with system titles
+    const bandHeight = 18;   // Fixed band height (from original)
+    const shiftSvgBy = 12;   // shift svg up to align with system titles
+    const barYOffset = 10;   // NEW: Additional offset just for bars
     
     let compactHeight = $derived(yDomain.size * bandHeight);
     let innerWidth = $derived(width - marginLeft - marginRight);
@@ -40,7 +41,7 @@
     
     // Compute ranges exactly like D3
     let xRange = $derived([0, innerWidth]);
-    let yRange = $derived([xAxisYOffset, xAxisYOffset + compactHeight]);
+    let yRange = $derived([xAxisYOffset + barYOffset, xAxisYOffset + barYOffset + compactHeight]);
     
     // Filter indices and create lookup
     let I = $derived(d3.range(X.length).filter(i => yDomain.has(Y[i])));
@@ -99,7 +100,7 @@
                     x1={xScale(tick)} 
                     y1="0" 
                     x2={xScale(tick)}
-                    y2={innerHeight - xAxisYOffset} 
+                    y2={innerHeight - xAxisYOffset + barYOffset} 
                     style={tick === 0 ? "stroke: rgb(38, 38, 38); stroke-width: 1; stroke-opacity: 0.8;" : wordshiftStyles.gridLine()}
                 />
                 <!-- Tick labels -->
@@ -119,7 +120,7 @@
             >{xLabel}</text>
         </g>
         
-        <!-- Bars -->
+        <!-- Bars are now offset by the additional barYOffset -->
         {#each I as i}
             <rect
                 class="wordshift-bar"

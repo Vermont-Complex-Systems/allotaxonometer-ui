@@ -136,10 +136,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .allo-fonts {
-    font-family: "EB Garamond", "Garamond", "Century Schoolbook L",
-                 "URW Bookman L", "Bookman Old Style", "Times", serif;
-  }
-</style>
