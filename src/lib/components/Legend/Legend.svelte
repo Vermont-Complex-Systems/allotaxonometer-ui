@@ -4,7 +4,11 @@
     let { 
         diamond_dat, 
         DiamondHeight,
-        max_count_log // Add this as a prop to match D3 version
+        max_count_log,
+        tickSize = 0,
+        marginLeft = 10,
+        marginTop = 65,
+        marginRight = 40
     } = $props();
 
     const N_CATEGO = 20;
@@ -12,7 +16,7 @@
     const color = scaleOrdinal(range(N_CATEGO), myramp);
 
     let height = 370;
-    const margin = { right: 40, top: 65, left: 10 };
+    const margin = { right: marginRight, top: marginTop, left: marginLeft };
     
     let innerHeight = $derived(height - margin.top - margin.right);   
     let max_rank = $derived(max(diamond_dat, (d) => d.rank_L[1]));
@@ -26,33 +30,62 @@
     let logFormat10 = $derived(logY.tickFormat());
     let yTicks = $derived(logY.ticks());
 </script>
-    
-    <g class="legend-container" transform="translate({margin.left}, {DiamondHeight-margin.top})">
-      {#each color.domain() as d}
+
+<g class="legend-container" transform="translate({margin.left}, {DiamondHeight-margin.top})">
+    <!-- Color swatches -->
+    {#each color.domain() as d}
         <rect
-            x={ 0 }
-            y={ y(d) }
-            width={ 14 }
-            height={ 13 }
-            fill={ color(d) }
+            class="legend-swatch"
+            x="0"
+            y={y(d)}
+            width="14"
+            height="13"
+            fill={color(d)}
             stroke="whitesmoke"
             stroke-width="1"
-        ></rect>
-      {/each}
-    </g>
-    {#each yTicks as tick, i}
-      <g class="legend-text" transform="translate({margin.left}, {DiamondHeight+logY(tick)-margin.top})">
-        <text
-          font-size="10" 
-          dy={ yTicks.length-1 == i ? "-3" :  "13" }
-          dx="20"
-          >{ logFormat10(tick) }</text>
-        </g>
-      {#if i === yTicks.length-1}
-        <g class="legend-title" transform="translate({margin.left}, {DiamondHeight+logY(tick)-margin.top})">
-          <text      
-          font-size="13" 
-          dy={"9"}>Counts per cell</text>
-        </g>
-      {/if}
+        />
     {/each}
+    
+    <!-- Scale ticks and labels -->
+    {#each yTicks as tick, i}
+        <g class="legend-tick" transform="translate({margin.left}, {logY(tick)-margin.top})">
+            <text
+                class="legend-tick-label"
+                dy={yTicks.length-1 == i ? "-3" : "13"}
+                dx="20"
+            >{logFormat10(tick)}</text>
+        </g>
+        
+        {#if i === yTicks.length-1}
+            <g class="legend-title-container" transform="translate({margin.left}, {logY(tick)-margin.top})">
+                <text class="legend-title" dy="9">Counts per cell</text>
+            </g>
+        {/if}
+    {/each}
+</g>
+
+<style>
+    .legend-container {
+        font-family: var(--allo-font-family);
+    }
+    
+    .legend-swatch {
+        /* Color swatches - styling handled by fill attribute */
+    }
+    
+    .legend-tick-label {
+        font-family: var(--allo-font-family);
+        font-size: 14px;
+        fill: var(--allo-verydarkgrey);
+        text-anchor: start;
+    }
+    
+    .legend-title {
+        font-family: var(--allo-font-family);
+        font-size: 14px;
+        fill: var(--allo-verydarkgrey);
+        text-anchor: start;
+        font-weight: normal;
+    }
+    
+</style>

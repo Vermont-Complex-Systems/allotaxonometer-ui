@@ -1,3 +1,5 @@
+import './styles/variables.css';
+
 // Main Dashboard
 export { Dashboard } from './components/Dashboard/index.js';
 

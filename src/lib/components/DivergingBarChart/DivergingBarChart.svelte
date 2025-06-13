@@ -40,19 +40,6 @@
 </script>
 
 <g class="balance-chart" transform="translate({DiamondWidth-75}, {DiamondHeight+75})">
-    <!-- Background grid lines (optional, matching D3 version) -->
-    <g class="grid" transform="translate(0,{marginTop})">
-        {#each xScale.ticks(width / 80) as tick}
-            <line 
-                x1={xScale(tick)} 
-                y1="0" 
-                x2={xScale(tick)}
-                y2={height - marginTop - marginBottom} 
-                stroke="currentColor"
-                stroke-opacity="0.1"
-            />
-        {/each}
-    </g>
     
     <!-- Bars -->
     {#each I as i}

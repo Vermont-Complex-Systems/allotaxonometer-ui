@@ -25,7 +25,6 @@
     let diamondHeight = $derived(innerHeight - marginDiamond);
 
     function get_relevant_types(diamond_dat) {
-        // Use the logic from your D3 version instead
         const ncells = d3.max(diamond_dat, d => d.x1);
         const cumbin = d3.range(0, ncells, 1.5);
         const relevant_types = [];
@@ -41,7 +40,6 @@
                     const max_dist = cos_dists.reduce((a, b) => Math.max(a, b));
                     const max_dist_idx = cos_dists.indexOf(max_dist);
                     
-                    // SSR-safe random selection
                     const types = filtered_dat[max_dist_idx]['types'].split(",");
                     const name = types[Math.floor(Math.random() * types.length)];
                     relevant_types.push(name);
@@ -55,7 +53,7 @@
         return Array.from(arr1, (x) => arr2.indexOf(x) !== -1);
     }
     
-    // Wrangling data - Fixed variable references
+    // Wrangling data
     let relevant_types = $derived(get_relevant_types(diamond_dat));
     let ncells = $derived(d3.max(diamond_dat, d => d.x1));
     let max_rank = $derived(d3.max(diamond_dat, (d) => d.rank_L[1]));
@@ -70,7 +68,7 @@
     
     let color_scale = d3.scaleSequentialLog().domain([rounded_max_rank, 1]).interpolator(d3.interpolateInferno);     
     
-    // Background triangles (using innerHeight like D3 version)
+    // Background triangles
     let blue_triangle = $derived([[innerHeight, innerHeight], [0, 0], [0, innerHeight]].join(" "));
     let grey_triangle = $derived([[innerHeight, innerHeight], [0, 0], [innerHeight, 0]].join(" "));
     
@@ -81,44 +79,99 @@
 
 <g class='diamond-chart' transform="translate(360, 0) scale (-1,1) rotate(45) translate({innerHeight/4}, {innerHeight/4})">
     
-    <polygon points={blue_triangle} fill="#89CFF0" fill-opacity="0.2" stroke="black" stroke-width="0.5"/>
-    <polygon points={grey_triangle} fill="grey" fill-opacity="0.2" stroke="black" stroke-width="0.5"/>
-    
+    <!-- Background polygons with correct colors - order matters! -->
+        <polygon 
+            class="diamond-background grey-triangle"
+            points={grey_triangle} 
+            fill="var(--allo-lightgrey, rgb(230, 230, 230))"
+            fill-opacity="0.8"
+            stroke="black" 
+            stroke-width="0.5"
+        />
+        <polygon 
+            class="diamond-background blue-triangle"
+            points={blue_triangle} 
+            fill="var(--allo-paleblue, rgb(195, 230, 243))"
+            fill-opacity="0.8"
+            stroke="black" 
+            stroke-width="0.5"
+        />
+
     <AxisX height={innerHeight} scale={logScale} {title}/>
     <AxisY height={innerHeight} scale={logScale} {title}/>
     <Grid height={innerHeight} {wxy} {ncells} scale={linScale}></Grid>
 
+    <!-- Base layer: Heatmap cells with fill, NO stroke -->
     {#each diamond_dat as d}
         <rect
+            class="diamond-cell"
             x={xy(d.x1)}
             y={xy(d.y1)}
             width={xy.bandwidth()}
             height={xy.bandwidth()}
-            fill={color_scale(d.value)}
+            fill={d.value === 0 ? "none" : d.value > 10 ? "red" : d.value > 5 ? "orange" : "yellow"}
             opacity={d.value === 0 ? 0 : 1}
-            stroke="black"
-            stroke-width={d.value === 0 ? 0 : 0.1}
-            stroke-opacity={d.value === 0 ? 0 : 0.9}
         />
     {/each}
 
+    <!-- Overlay layer: Stroke-only rects (placed on top) -->
+    {#each diamond_dat as d}
+        <rect
+            class="diamond-cell-heat"
+            x={xy(d.x1)}
+            y={xy(d.y1)}
+            width={xy.bandwidth()}
+            height={xy.bandwidth()}
+            fill={d.value === 0 ? "none" : color_scale(d.value)}
+        />
+    {/each}
+
+    <!-- Text labels with correct positioning -->
     {#each diamond_dat.filter(d => filter_labs(d, relevant_types)) as d}
-        <g class="diamond-lab" 
-        transform="
-            scale(1,-1) 
-            rotate(-90) 
-            rotate(-45, {xy(d.x1)}, {xy(d.y1)}) 
-            translate({d.which_sys === "right" ? xy(Math.sqrt(d.cos_dist))*1.5 : -xy(Math.sqrt(d.cos_dist))*1.5}, 0)
-        ">
         <text
+            class="diamond-label"
             x={xy(d.x1)}
             y={Number.isInteger(d.coord_on_diag) ? xy(d.y1) : xy(d.y1)-1}
-            dy="20"
-            font-size="10"
+            dx={d.x1 - d.y1 <= 0 ? 5 : -5}
+            dy="5"
             text-anchor={d.x1 - d.y1 <= 0 ? "start" : "end"}
+            transform="scale(1,-1) rotate(-90) rotate(-45, {xy(d.x1)}, {xy(d.y1)}) translate({d.which_sys === "right" ? xy(Math.sqrt(d.cos_dist))*1.5 : -xy(Math.sqrt(d.cos_dist))*1.5}, 0)"
         >{d.types.split(",")[0]}</text>
-        </g>
     {/each}
+
+    <!-- Middle diagonal line -->
+    <line 
+        class="diamond-middle-line"
+        x1="0"
+        y1="0" 
+        x2={innerHeight-7}
+        y2={innerHeight-7}
+    />
 
     <Contours {alpha} {maxlog10} {divnorm} DiamondInnerHeight={innerHeight}></Contours>
 </g>
+
+<style>
+  .diamond-chart {
+    font-family: var(--allo-font-family, "EB Garamond", "Times", serif);
+    overflow: visible;
+  }
+  
+  .diamond-label {
+    font-family: var(--allo-font-family, "EB Garamond", "Times", serif);
+    font-size: 12px;
+    fill: var(--allo-darkergrey, rgb(89, 89, 89));
+  }
+
+  .diamond-middle-line {
+    stroke: var(--allo-verydarkgrey, rgb(38, 38, 38));
+    stroke-width: 0.5;
+  }
+  
+  /* Global styling with fallbacks */
+  :global(.diamond-chart .axis text) {
+    font-family: var(--allo-font-family, "EB Garamond", "Times", serif);
+    font-size: 12px;
+    fill: var(--allo-darkergrey, rgb(89, 89, 89));
+  }
+</style>

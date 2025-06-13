@@ -1,0 +1,39 @@
+/* Auto-generated */
+
+:root {
+  /* Color Variables */
+  --allo-blue: rgb(43, 103, 198);
+  --allo-red: rgb(198, 43, 103);
+  --allo-paleblue: rgb(195, 230, 243);
+  --allo-palered: rgb(255, 204, 204);
+  --allo-lightergrey: rgb(245, 245, 245);
+  --allo-lightishgrey: rgb(237, 237, 237);
+  --allo-lightgrey: rgb(230, 230, 230);
+  --allo-lightgreyer: rgb(217, 217, 217);
+  --allo-lightgreyish: rgb(204, 204, 204);
+  --allo-grey: rgb(191, 191, 191);
+  --allo-darkgrey: rgb(140, 140, 140);
+  --allo-darkergrey: rgb(89, 89, 89);
+  --allo-verydarkgrey: rgb(38, 38, 38);
+  --allo-superdarkgrey: rgb(26, 26, 26);
+  --allo-reallyverdarkgrey: rgb(13, 13, 13);
+  --allo-orange: rgb(255, 116, 0);
+  
+  /* Typography */
+  --allo-font-family: "EB Garamond", "Garamond", "Century Schoolbook L", "URW Bookman L", "Bookman Old Style", "Times", serif;
+  
+  /* Font sizes */
+  --allo-font-xs: 10px;
+  --allo-font-sm: 12px;
+  --allo-font-md: 14px;
+  --allo-font-lg: 16px;
+  --allo-font-xl: 18px;
+}
+
+body {
+  font-family: var(--allo-font-family);
+}
+
+.allo-fonts {
+  font-family: var(--allo-font-family);
+}
