@@ -1,6 +1,6 @@
 <script>
     import { scaleOrdinal, range, interpolateInferno, scaleBand, rgb } from "d3";
-    import { legendStyles } from '../../styles/styleHelpers.js';
+    import { alloColors, alloFonts } from '../../utils/aesthetics.js';
     
     let { 
         diamond_dat, 
@@ -53,7 +53,7 @@
                     dx="30"
                     dy="-30" 
                     transform="rotate(90)"
-                    style={legendStyles.tick()}
+                    style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.verydarkgrey}; text-anchor: start;"
                 >{tick}</text>
             </g>
         {/each}
@@ -66,7 +66,7 @@
             dx="30"             
             dy="-5"             
             transform="rotate(90)" 
-            style={legendStyles.title()}
+            style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.verydarkgrey}; text-anchor: start;"
         >Counts per cell</text>
     </g>
 </svg>

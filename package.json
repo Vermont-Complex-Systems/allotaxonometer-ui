@@ -27,7 +27,7 @@
     "headless-ui",
     "components"
   ],
-  "author": "Your Name <your.email@example.com>",
+  "author": "Jonathan St-Onge <jonathanstonge7@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -62,7 +62,7 @@
     "test:ssr": "npm run build:ssr && vitest run tests/ssr.test.js",
     "test:legend": "vitest run tests/Legend.test.js",
     "prepublishOnly": "npm run build:all",
-    "test:pipe": "npm run build:all && npx vitest run tests/FullPipeline.test.js",
+    "test:pipe": "npm run build:all && npx vitest run tests/DashboardSSR.test.js",
     "test:pipe:watch": "npm run test:pipe && (open test-output/full-pipeline-vitest.html || start test-output/full-pipeline-vitest.html || xdg-open test-output/full-pipeline-vitest.html)"
   }
 }

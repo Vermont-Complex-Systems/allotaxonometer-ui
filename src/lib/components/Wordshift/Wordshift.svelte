@@ -1,6 +1,6 @@
 <script>
     import * as d3 from "d3";
-    import { wordshiftStyles } from '../../styles/styleHelpers.js';
+    import { alloColors, alloFonts } from '../../utils/aesthetics.js';
 
     let { 
         barData, 
@@ -16,7 +16,7 @@
         xFormat = '%',
         xLabel = '← System 1 · Divergence contribution · System 2 →',
         yPadding = 0,
-        colors = ['lightgrey', 'lightblue'],
+        colors = [alloColors.css.lightgrey, alloColors.css.paleblue],
         barHeightFactor = 0.7
     } = $props();
     
@@ -32,7 +32,7 @@
     const xAxisYOffset = 10; // Space below x-axis (from original)
     const bandHeight = 18;   // Fixed band height (from original)
     const shiftSvgBy = 12;   // shift svg up to align with system titles
-    const barYOffset = 10;   // NEW: Additional offset just for bars
+    const barYOffset = 10;   // Additional offset just for bars
     
     let compactHeight = $derived(yDomain.size * bandHeight);
     let innerWidth = $derived(width - marginLeft - marginRight);
@@ -82,7 +82,6 @@
 >
     <!-- Main wrapper transform matching D3 exactly -->
     <g class='wordshift-container' transform="translate({marginLeft}, {marginTop - shiftSvgBy})">
-        <!-- X-axis with grid lines -->
         <!-- X-axis with ticks and grid lines -->
         <g class='wordshift-axis x' transform="translate(0, {xAxisYOffset})">
             {#each xTicks as tick}
@@ -101,14 +100,14 @@
                     y1="0" 
                     x2={xScale(tick)}
                     y2={innerHeight - xAxisYOffset + barYOffset} 
-                    style={tick === 0 ? "stroke: rgb(38, 38, 38); stroke-width: 1; stroke-opacity: 0.8;" : wordshiftStyles.gridLine()}
+                    style={tick === 0 ? `stroke: ${alloColors.css.verydarkgrey}; stroke-width: 1; stroke-opacity: 0.8;` : `stroke: currentColor; stroke-opacity: 0.1;`}
                 />
                 <!-- Tick labels -->
                 <text 
                     x={xScale(tick)} 
                     y="-12" 
                     text-anchor="middle"
-                    style={wordshiftStyles.tickLabel()}
+                    style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.verydarkgrey};"
                 >{format(tick)}</text>
             {/each}
             
@@ -116,11 +115,12 @@
             <text 
                 x={xScale(0)} 
                 y="-35" 
-                style={wordshiftStyles.axisTitle()}
+                text-anchor="middle"
+                style="font-family: {alloFonts}; font-size: 16px; fill: {alloColors.css.verydarkgrey};"
             >{xLabel}</text>
         </g>
         
-        <!-- Bars are now offset by the additional barYOffset -->
+        <!-- Bars -->
         {#each I as i}
             <rect
                 class="wordshift-bar"
@@ -144,7 +144,7 @@
                         x={xValue > 0 ? 6 : -6}
                         dy="0.32em"
                         text-anchor={xValue > 0 ? "start" : "end"}
-                        style={wordshiftStyles.nameLabel()}
+                        style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.verydarkgrey};"
                     >{labelData.name_y}</text>
                     
                     <!-- Numbers text on the opposite side (matching D3 positioning) -->
@@ -153,7 +153,7 @@
                             x={xValue > 0 ? -6 : 6}
                             dy="0.32em"
                             text-anchor={xValue > 0 ? "end" : "start"}
-                            style={wordshiftStyles.numbersLabel()}
+                            style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.darkergrey}; opacity: 0.5;"
                         >{labelData.numbers_y}</text>
                     {/if}
                 </g>

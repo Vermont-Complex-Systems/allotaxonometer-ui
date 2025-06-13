@@ -1,6 +1,6 @@
 <script>
     import { scaleBand, rollup, range, InternSet, scaleLinear, extent, map } from "d3";
-        import { balanceStyles } from '../../styles/styleHelpers.js';
+    import { alloColors, alloFonts } from '../../utils/aesthetics.js';
     
     let { 
         data,
@@ -12,7 +12,7 @@
         marginLeft = 40,
         width = 200,
         yPadding = 0.5,
-        colors = ["lightgrey", "lightblue"]
+        colors = [alloColors.css.lightgrey, alloColors.css.paleblue]
     } = $props();
 
     // Compute values (matching D3 version exactly)
@@ -60,12 +60,9 @@
             <text
                 x={xScale(X[i]) + Math.sign(X[i] - 0) * 4}
                 y={yScale(Y[i]) + yScale.bandwidth() / 2}
-                opacity="0.5"
                 dy="0.35em"
-                font-size="10"
-                font-family="EB Garamond, serif"
                 text-anchor={X[i] < 0 ? "end" : "start"}
-                style={balanceStyles.valueLabel()}
+                style="font-family: {alloFonts}; font-size: 10px; fill: {alloColors.css.darkergrey}; opacity: 0.5;"
             >{format(Math.abs(X[i]))}</text>
         {/each}
         
@@ -78,7 +75,7 @@
                     dy="0.35em"
                     text-anchor="middle"
                     opacity={YX.get(label) ? "0.5" : "1"}
-                    style={balanceStyles.yLabel()}
+                    style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.darkergrey};"
                 >{label}</text>
             {/each}
         </g>

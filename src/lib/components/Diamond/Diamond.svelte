@@ -4,7 +4,7 @@
     import AxisY from './AxisY.svelte';
     import Grid from './Grid.svelte';
     import Contours from './Contours.svelte';
-    import { diamondStyles } from '../../styles/styleHelpers.js';
+    import { alloColors, alloFonts } from '../../utils/aesthetics.js';
 
     let { 
         dat, 
@@ -86,11 +86,11 @@
     style="overflow: visible; display: block;"
     transform="scale(-1,1) rotate(45) translate({innerHeight/4}, {innerHeight/4})"
 >   
-    <!-- Background polygons with correct colors - order matters! -->
+    <!-- Background polygons with correct colors from aesthetics.js -->
     <polygon 
         class="diamond-background grey-triangle"
         points={grey_triangle} 
-        fill="rgb(230, 230, 230)"
+        fill={alloColors.css.lightgrey}
         fill-opacity="0.8"
         stroke="black" 
         stroke-width="0.5"
@@ -98,7 +98,7 @@
     <polygon 
         class="diamond-background blue-triangle"
         points={blue_triangle} 
-        fill="rgb(195, 230, 243)"
+        fill={alloColors.css.paleblue}
         fill-opacity="0.8"
         stroke="black" 
         stroke-width="0.5"
@@ -108,32 +108,32 @@
     <AxisY {innerHeight} scale={logScale} {title}/>
     <Grid height={innerHeight} {wxy} {ncells} scale={linScale}></Grid>
 
-    <!-- Base layer: Heatmap cells with fill, NO stroke -->
-    {#each diamond_dat as d}
-        <rect
-            class="diamond-cell"
-            x={xy(d.x1)}
-            y={xy(d.y1)}
-            width={xy.bandwidth()}
-            height={xy.bandwidth()}
-            fill={d.value === 0 ? "none" : d.value > 10 ? "red" : d.value > 5 ? "orange" : "yellow"}
-            opacity={d.value === 0 ? 0 : 1}
-        />
-    {/each}
-
-     <!-- Overlay layer: Stroke-only rects -->
+    <!-- Heatmap cells with color scale -->
     {#each diamond_dat as d}
         <rect
             x={xy(d.x1)}
             y={xy(d.y1)}
             width={xy.bandwidth()}
             height={xy.bandwidth()}
-            fill={d.value > 0 ? color_scale(d.value): "none"}
-            style={d.value > 0 ? diamondStyles.cellStroke() : ''}
+            fill={d.value === 0 ? "none" : color_scale(d.value)}
         />
     {/each}
 
-    <!-- Text labels -->
+     <!-- Overlay layer: Stroke-only rects matching original D3 -->
+    {#each diamond_dat as d}
+        <rect
+            x={xy(d.x1)}
+            y={xy(d.y1)}
+            width={xy.bandwidth()}
+            height={xy.bandwidth()}
+            fill={d.value > 0 ? 'rgba(255,255,255,0.001)' : 'none'}
+            stroke={d.value > 0 ? alloColors.css.darkergrey : 'none'}
+            stroke-width={d.value > 0 ? '1.18' : '0'}
+            stroke-opacity={d.value > 0 ? '0.4' : '0'}
+        />
+    {/each}
+
+    <!-- Text labels with aesthetics styling -->
     {#each diamond_dat.filter(d => filter_labs(d, relevant_types)) as d}
         <text
             x={xy(d.x1)}
@@ -142,14 +142,15 @@
             dy="5"
             text-anchor={d.x1 - d.y1 <= 0 ? "start" : "end"}
             transform="scale(1,-1) rotate(-90) rotate(-45, {xy(d.x1)}, {xy(d.y1)}) translate({d.which_sys === "right" ? xy(Math.sqrt(d.cos_dist))*1.5 : -xy(Math.sqrt(d.cos_dist))*1.5}, 0)"
-            style={diamondStyles.label()}
+            style="font-family: {alloFonts}; font-size: 12px; fill: {alloColors.css.darkergrey};"
         >{d.types.split(",")[0]}</text>
     {/each}
-    <!-- Middle diagonal line -->
+
+    <!-- Middle diagonal line with aesthetics colors -->
     <line 
         x1="0" y1="0" 
         x2={innerHeight-7} y2={innerHeight-7}
-        style={diamondStyles.middleLine()}
+        style="stroke: {alloColors.css.verydarkgrey}; stroke-width: 0.5;"
     />
 
     <Contours {alpha} {maxlog10} {divnorm} DiamondInnerHeight={innerHeight}></Contours>

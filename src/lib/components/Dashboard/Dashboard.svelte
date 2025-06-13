@@ -4,7 +4,7 @@
   import DivergingBarChart from '../DivergingBarChart/DivergingBarChart.svelte';
   import Legend from '../Legend/Legend.svelte';
 
-  import { dashboardStyles } from '../../styles/styleHelpers.js';
+  import { alloColors, alloFonts } from '../../utils/aesthetics.js';
 
   interface DashboardProps {
     // Updated data props (new API)
@@ -79,20 +79,18 @@
   let wordshiftXDomain = $derived(xDomain || [-max_shift * 1.5, max_shift * 1.5]);
 </script>
 
-
-
 <div class="allotaxonometer-dashboard" style="position: relative; margin: 0; padding: 0;">
   <div style="display:flex; flex-wrap: wrap; align-items:center; justify-content: center; row-gap: 50px;">
     <div style="margin-top:20px">
       <!-- Titles with instrument text positioned relative to left title -->
       <div style="display:flex; gap: 10em; justify-content: center; margin-bottom: -70px; margin-right: 70px; position: relative;">
           <div style="position: relative;">
-            <div style={dashboardStyles.title()}>{title[0]}</div>
+            <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[0]}</div>
             <!-- Instrument text positioned at far left edge -->
-            <div style="position: absolute; top: 100%; left: -12em; margin-top: 2.5em; {dashboardStyles.instrumentText()}">{instrumentText}</div>
-            <div style="position: absolute; top: 100%; left: -12em; margin-top: 3.5em; {dashboardStyles.alphaText()}">α = {alpha}</div>
+            <div style="position: absolute; top: 100%; left: -12em; margin-top: 2.5em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey};">{instrumentText}</div>
+            <div style="position: absolute; top: 100%; left: -12em; margin-top: 3.5em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey};">α = {alpha}</div>
           </div>
-          <div style={dashboardStyles.title()}>{title[1]}</div>
+          <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[1]}</div>
       </div>
       
       <div id="diamondplot">
