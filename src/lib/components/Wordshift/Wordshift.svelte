@@ -44,10 +44,6 @@
     let format = $derived(xScale.tickFormat(100, xFormat));
     let xTicks = $derived(xScale.ticks(width / 80));
     
-    // Position the chart (matching your current positioning)
-    let chartX = $derived(DashboardWidth - width + marginLeft);
-    let chartY = $derived(marginTop);
-    
     // Helper function matching D3 logic exactly
     function parseLabelData(label) {
         const splitIndex = label.indexOf(' ');
@@ -65,9 +61,17 @@
         }
         return { name_y, numbers_y };
     }
+
+    let finalHeight = $derived(height || (computedHeight + marginTop + marginBottom));
 </script>
 
-<g class='wordshift-container' transform="translate({chartX}, {chartY})">
+<svg 
+    {width} 
+    height={finalHeight}
+    viewBox="0 0 {width} {finalHeight}"
+    style="overflow: visible; display: block;"
+>
+<g class='wordshift-container'>
     <!-- X-axis with grid lines -->
     <g class='wordshift-axis x' transform="translate(0, {marginTop})">
         {#each xTicks as tick}
@@ -86,6 +90,9 @@
                     x={xScale(tick)} 
                     y="-12" 
                     text-anchor="middle"
+                    font-family="EB Garamond, serif"
+                    font-size="14"
+                    fill="#333"
                 >{format(tick)}</text>
             </g>
         {/each}
@@ -96,6 +103,9 @@
             x={xScale(0)} 
             y="-35" 
             text-anchor="middle"
+            font-family="EB Garamond, serif"
+            font-size="16"
+            fill="#333"
         >{xLabel}</text>
     </g>
     
@@ -123,6 +133,9 @@
                     x={xValue > 0 ? 6 : -6}
                     dy="0.32em"
                     text-anchor={xValue > 0 ? "start" : "end"}
+                    font-family="EB Garamond, serif"
+                    font-size="14"
+                    fill="#333"
                 >{labelData.name_y}</text>
                 
                 <!-- Numbers text on the opposite side (matching D3 positioning) -->
@@ -132,55 +145,14 @@
                         x={xValue > 0 ? -6 : 6}
                         dy="0.32em"
                         text-anchor={xValue > 0 ? "end" : "start"}
+                        font-family="EB Garamond, serif"
+                        font-size="14"
+                        fill="#666"
+                        opacity="0.7"
                     >{labelData.numbers_y}</text>
                 {/if}
             </g>
         {/each}
     </g>
 </g>
-
-<style>
-    .wordshift-container {
-        font-family: var(--allo-font-family);
-    }
-    
-    .wordshift-axis {
-        font-family: var(--allo-font-family);
-    }
-    
-    .wordshift-grid-line {
-        /* Grid lines now have inline stroke properties to match D3 */
-    }
-    
-    .wordshift-tick-label {
-        font-family: var(--allo-font-family);
-        font-size: 14px;
-        fill: var(--allo-verydarkgrey);
-    }
-    
-    .wordshift-axis-title {
-        font-family: var(--allo-font-family);
-        font-size: 16px;
-        fill: var(--allo-verydarkgrey);
-    }
-    
-    .wordshift-name-label {
-        font-family: var(--allo-font-family);
-        font-size: 14px;
-        fill: var(--allo-verydarkgrey);
-        dominant-baseline: middle;
-    }
-    
-    .wordshift-numbers-label {
-        font-family: var(--allo-font-family);
-        font-size: 14px;
-        fill: var(--allo-darkergrey);
-        opacity: 0.5;
-        dominant-baseline: middle;
-    }
-    
-    .wordshift-y-axis {
-        font-family: var(--allo-font-family);
-        font-size: 14px;
-    }
-</style>
+</svg>

@@ -20,7 +20,7 @@
     let diamond_dat = $derived(dat.counts);
     let deltas = $derived(dat.deltas);
     
-    // Calculate derived dimensions (matching D3 version)
+    // Calculate derived dimensions (matching D3 version exactly)
     let innerHeight = $derived(DiamondHeight - marginInner);   
     let diamondHeight = $derived(innerHeight - marginDiamond);
 
@@ -77,25 +77,33 @@
     }
 </script>
 
-<g class='diamond-chart' transform="translate(360, 0) scale (-1,1) rotate(45) translate({innerHeight/4}, {innerHeight/4})">
+<svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={DiamondHeight} 
+    height={DiamondHeight}
+    viewBox="0 0 {DiamondHeight} {DiamondHeight}"
+    style="overflow: visible; display: block;"
+    transform="scale(-1,1) rotate(45) translate({innerHeight/4}, {innerHeight/4})"
+>
+    <!-- Remove the g wrapper and put content directly in SVG -->
     
     <!-- Background polygons with correct colors - order matters! -->
-        <polygon 
-            class="diamond-background grey-triangle"
-            points={grey_triangle} 
-            fill="var(--allo-lightgrey, rgb(230, 230, 230))"
-            fill-opacity="0.8"
-            stroke="black" 
-            stroke-width="0.5"
-        />
-        <polygon 
-            class="diamond-background blue-triangle"
-            points={blue_triangle} 
-            fill="var(--allo-paleblue, rgb(195, 230, 243))"
-            fill-opacity="0.8"
-            stroke="black" 
-            stroke-width="0.5"
-        />
+    <polygon 
+        class="diamond-background grey-triangle"
+        points={grey_triangle} 
+        fill="rgb(230, 230, 230)"
+        fill-opacity="0.8"
+        stroke="black" 
+        stroke-width="0.5"
+    />
+    <polygon 
+        class="diamond-background blue-triangle"
+        points={blue_triangle} 
+        fill="rgb(195, 230, 243)"
+        fill-opacity="0.8"
+        stroke="black" 
+        stroke-width="0.5"
+    />
 
     <AxisX height={innerHeight} scale={logScale} {title}/>
     <AxisY height={innerHeight} scale={logScale} {title}/>
@@ -146,32 +154,27 @@
         y1="0" 
         x2={innerHeight-7}
         y2={innerHeight-7}
+        stroke="rgb(38, 38, 38)"
+        stroke-width="0.5"
     />
 
     <Contours {alpha} {maxlog10} {divnorm} DiamondInnerHeight={innerHeight}></Contours>
-</g>
+</svg>
 
 <style>
   .diamond-chart {
-    font-family: var(--allo-font-family, "EB Garamond", "Times", serif);
+    font-family: "EB Garamond", "Garamond", "Century Schoolbook L", serif;
     overflow: visible;
   }
   
   .diamond-label {
-    font-family: var(--allo-font-family, "EB Garamond", "Times", serif);
+    font-family: "EB Garamond", "Garamond", "Century Schoolbook L", serif;
     font-size: 12px;
-    fill: var(--allo-darkergrey, rgb(89, 89, 89));
+    fill: rgb(89, 89, 89);
   }
 
   .diamond-middle-line {
-    stroke: var(--allo-verydarkgrey, rgb(38, 38, 38));
+    stroke: rgb(38, 38, 38);
     stroke-width: 0.5;
-  }
-  
-  /* Global styling with fallbacks */
-  :global(.diamond-chart .axis text) {
-    font-family: var(--allo-font-family, "EB Garamond", "Times", serif);
-    font-size: 12px;
-    fill: var(--allo-darkergrey, rgb(89, 89, 89));
   }
 </style>

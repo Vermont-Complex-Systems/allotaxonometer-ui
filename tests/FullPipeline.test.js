@@ -5,63 +5,25 @@ import * as d3 from 'd3';
 
 describe('Full Pipeline Integration', () => {
   let combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, balanceDat, Dashboard;
+  let testData1, testData2;
   
   beforeAll(async () => {
     // Import everything from SSR build (since both have the same exports)
-    const module = await import('../../dist/ssr/index.js');
+    const module = await import('../dist/ssr/index.js');
     combElems = module.combElems;
     rank_turbulence_divergence = module.rank_turbulence_divergence;
     diamond_count = module.diamond_count;
     wordShift_dat = module.wordShift_dat;
     balanceDat = module.balanceDat;
     Dashboard = module.Dashboard;
+    
+    // Load real data from JSON files
+    const boys1968 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1968.json', 'utf8'));
+    const boys2018 = JSON.parse(fs.readFileSync('tests/fixtures/boys-2018.json', 'utf8'));
+    
+    testData1 = boys1968;
+    testData2 = boys2018;
   });
-
-  const testData1 = [
-    { types: "1", counts: 100, probs: 0.1 },
-    { types: "2", counts: 80, probs: 0.08 },
-    { types: "3", counts: 60, probs: 0.06 },
-    { types: "4", counts: 40, probs: 0.04 },
-    { types: "5", counts: 20, probs: 0.02 },
-    { types: "6", counts: 100, probs: 0.1 },
-    { types: "7", counts: 80, probs: 0.08 },
-    { types: "8", counts: 60, probs: 0.06 },
-    { types: "9", counts: 40, probs: 0.04 },
-    { types: "10", counts: 20, probs: 0.02 },
-    { types: "11", counts: 100, probs: 0.1 },
-    { types: "12", counts: 80, probs: 0.08 },
-    { types: "13", counts: 60, probs: 0.06 },
-    { types: "14", counts: 40, probs: 0.04 },
-    { types: "15", counts: 20, probs: 0.02 },
-    { types: "16", counts: 100, probs: 0.1 },
-    { types: "17", counts: 80, probs: 0.08 },
-    { types: "18", counts: 60, probs: 0.06 },
-    { types: "19", counts: 40, probs: 0.04 },
-    { types: "20", counts: 20, probs: 0.02 }
-  ];
-  
-  const testData2 = [
-    { types: "1", counts: 90, probs: 0.09 },
-    { types: "2", counts: 110, probs: 0.11 },
-    { types: "21", counts: 50, probs: 0.05 },
-    { types: "4", counts: 30, probs: 0.03 },
-    { types: "22", counts: 25, probs: 0.025 },
-    { types: "2", counts: 90, probs: 0.09 },
-    { types: "3", counts: 110, probs: 0.11 },
-    { types: "5", counts: 50, probs: 0.05 },
-    { types: "7", counts: 30, probs: 0.03 },
-    { types: "10", counts: 25, probs: 0.025 },
-    { types: "11", counts: 90, probs: 0.09 },
-    { types: "12", counts: 110, probs: 0.11 },
-    { types: "18", counts: 50, probs: 0.05 },
-    { types: "19", counts: 30, probs: 0.03 },
-    { types: "6", counts: 25, probs: 0.025 },
-    { types: "13", counts: 90, probs: 0.09 },
-    { types: "15", counts: 110, probs: 0.11 },
-    { types: "14", counts: 50, probs: 0.05 },
-    { types: "17", counts: 30, probs: 0.03 },
-    { types: "18", counts: 25, probs: 0.025 }
-  ];
 
   test('data processing pipeline completes successfully', () => {
     const alpha = 0.17;
@@ -89,8 +51,8 @@ describe('Full Pipeline Integration', () => {
 
   test('dashboard renders with processed data', () => {
     const alpha = 0.17;
-    const title1 = "Test System 1";
-    const title2 = "Test System 2";
+    const title1 = "Boys Names 1968";
+    const title2 = "Boys Names 2018";
     
     // Process data
     const me = combElems(testData1, testData2);
@@ -143,8 +105,8 @@ describe('Full Pipeline Integration', () => {
 
   test('generates complete visual test', () => {
     const alpha = 0.17;
-    const title1 = "Test System 1";
-    const title2 = "Test System 2";
+    const title1 = "Boys Names 1968";
+    const title2 = "Boys Names 2018";
     
     // Process data
     const me = combElems(testData1, testData2);
@@ -188,7 +150,7 @@ describe('Full Pipeline Integration', () => {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Full Pipeline Test</title>
+  <title>Full Pipeline Test - Boys Names 1968 vs 2018</title>
   <style>
     body { font-family: sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
     .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -198,12 +160,12 @@ describe('Full Pipeline Integration', () => {
 </head>
 <body>
   <div class="container">
-    <h1>🔬 Full Pipeline Integration Test</h1>
+    <h1>🔬 Full Pipeline Integration Test - Boys Names Analysis</h1>
     
     <div class="info">
       <h3>Pipeline Results:</h3>
       <ul>
-        <li><strong>Input data:</strong> ${testData1.length} vs ${testData2.length} items</li>
+        <li><strong>Input data:</strong> ${testData1.length} vs ${testData2.length} names</li>
         <li><strong>Alpha:</strong> ${alpha}</li>
         <li><strong>Max log10:</strong> ${maxlog10}</li>
         <li><strong>Bar data:</strong> ${barData.length} points</li>

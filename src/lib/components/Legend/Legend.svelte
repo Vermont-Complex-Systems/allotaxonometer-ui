@@ -1,91 +1,75 @@
 <script>
-    import { scaleOrdinal, range, interpolateInferno, scaleBand, max, rgb, scaleLog } from "d3";
+    import { scaleOrdinal, range, interpolateInferno, scaleBand, rgb } from "d3";
     
     let { 
         diamond_dat, 
-        DiamondHeight,
         max_count_log,
         tickSize = 0,
-        marginLeft = 10,
-        marginTop = 65,
-        marginRight = 40
+        width = 300,
+        marginTop = 13,
+        marginBottom = 16 + tickSize,
+        marginLeft = 0,
+        N_CATEGO = 20
     } = $props();
 
-    const N_CATEGO = 20;
+    let height = $derived(44 + tickSize + marginTop + marginBottom);
+    
     const myramp = range(N_CATEGO).map(i => rgb(interpolateInferno(i / (N_CATEGO - 1))).hex());
     const color = scaleOrdinal(range(N_CATEGO), myramp);
 
-    let height = 370;
-    const margin = { right: marginRight, top: marginTop, left: marginLeft };
-    
-    let innerHeight = $derived(height - margin.top - margin.right);   
-    let max_rank = $derived(max(diamond_dat, (d) => d.rank_L[1]));
+    let x = $derived(scaleBand()
+        .domain(color.domain())
+        .rangeRound([marginLeft, width - 100]));
 
-    let y = $derived(scaleBand().domain(color.domain().reverse()).rangeRound([0, innerHeight]));
-    
-    // Use max_count_log if provided, otherwise calculate from data
-    let logDomain = $derived(max_count_log || 10**Math.ceil(Math.log10(max_rank)-1));
-    let logY = $derived(scaleLog().domain([1, logDomain]).rangeRound([0, innerHeight]).nice());
-
-    let logFormat10 = $derived(logY.tickFormat());
-    let yTicks = $derived(logY.ticks());
+    let x2 = $derived(scaleBand()
+        .domain(range(max_count_log).map(i => 10**i).sort((a, b) => b - a))
+        .rangeRound([marginLeft - 40, width - 90]));
 </script>
 
-<g class="legend-container" transform="translate({margin.left}, {DiamondHeight-margin.top})">
-    <!-- Color swatches -->
+<svg 
+    {width} 
+    {height}
+    viewBox="0 0 {width} {height}"
+    style="overflow: visible; display: block;"
+>
+    <!-- Color rectangles -->
     {#each color.domain() as d}
         <rect
-            class="legend-swatch"
-            x="0"
-            y={y(d)}
-            width="14"
-            height="13"
+            x={x(d)}
+            y={marginTop}
+            width={Math.max(0, x.bandwidth())}
+            height={x.bandwidth()}
             fill={color(d)}
-            stroke="whitesmoke"
-            stroke-width="1"
+            transform="rotate(-90) translate(-70,0)"
+            stroke="black"
+            stroke-width="0.65"
+            style="shape-rendering: crispEdges;"
         />
     {/each}
-    
-    <!-- Scale ticks and labels -->
-    {#each yTicks as tick, i}
-        <g class="legend-tick" transform="translate({margin.left}, {logY(tick)-margin.top})">
-            <text
-                class="legend-tick-label"
-                dy={yTicks.length-1 == i ? "-3" : "13"}
-                dx="20"
-            >{logFormat10(tick)}</text>
-        </g>
-        
-        {#if i === yTicks.length-1}
-            <g class="legend-title-container" transform="translate({margin.left}, {logY(tick)-margin.top})">
-                <text class="legend-title" dy="9">Counts per cell</text>
-            </g>
-        {/if}
-    {/each}
-</g>
 
-<style>
-    .legend-container {
-        font-family: var(--allo-font-family);
-    }
-    
-    .legend-swatch {
-        /* Color swatches - styling handled by fill attribute */
-    }
-    
-    .legend-tick-label {
-        font-family: var(--allo-font-family);
-        font-size: 14px;
-        fill: var(--allo-verydarkgrey);
-        text-anchor: start;
-    }
-    
-    .legend-title {
-        font-family: var(--allo-font-family);
-        font-size: 14px;
-        fill: var(--allo-verydarkgrey);
-        text-anchor: start;
-        font-weight: normal;
-    }
-    
-</style>
+    <!-- Text labels with the EXACT same attributes as D3 -->
+    <g transform="rotate(-90) translate(-60,5)">
+        {#each x2.domain() as tick}
+            <text
+                x={x2(tick)}
+                y="0"
+                dx="30"
+                dy="-5"
+                transform="rotate(90)"
+                text-anchor="start"
+                font-family="EB Garamond, serif"
+                font-size="14px"
+                fill="#333"
+            >{tick}</text>
+        {/each}
+        
+        <text
+            x={marginLeft - 25}
+            y={marginTop + marginBottom}
+            text-anchor="start"
+            font-size="14"
+            font-family="EB Garamond, serif"
+            fill="#333"
+        >Counts per cell</text>
+    </g>
+</svg>
