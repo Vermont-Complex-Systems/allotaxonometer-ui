@@ -59,7 +59,7 @@ export const axisStyles = {
   }),
 
   tickLine: () => style({
-    stroke: colors.darkgrey,
+    stroke: colors.darkergrey,
     strokeWidth: "0.5"
   })
 };
