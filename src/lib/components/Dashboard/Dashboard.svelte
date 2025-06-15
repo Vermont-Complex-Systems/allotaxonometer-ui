@@ -13,7 +13,7 @@
     divnorm?: number;             // Replaces rtd
     barData?: any[];
     balanceData?: any[];          // Pre-calculated balance data
-    
+
     // Configuration props
     title?: string[];
     maxlog10?: number;
@@ -27,17 +27,17 @@
     marginDiamond?: number;       // Replaces margin.diamond
     max_count_log?: number;       // For legend
     xDomain?: [number, number]; // Optional x-axis domain for Wordshift
-    
+
     // Style props
     class?: string;
     style?: string;
-    
+
     // Component visibility
     showDiamond?: boolean;
     showWordshift?: boolean;
     showDivergingBar?: boolean;
     showLegend?: boolean;
-    
+
     // Instrument text
     instrumentText?: string;
   }
@@ -71,8 +71,8 @@
   }: DashboardProps = $props();
 
   let max_shift = $derived(
-    barData.length > 0 
-      ? Math.max(...barData.map(d => Math.abs(d.metric))) 
+    barData.length > 0
+      ? Math.max(...barData.map(d => Math.abs(d.metric)))
       : 1
   );
 
@@ -92,43 +92,43 @@
           </div>
           <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[1]}</div>
       </div>
-      
+
       <div id="diamondplot">
-            <Diamond 
-              {dat} {alpha} {divnorm} {title} {maxlog10} 
+            <Diamond
+              {dat} {alpha} {divnorm} {title} {maxlog10}
               {DiamondHeight} {marginInner} {marginDiamond}
             />
       </div>
-      
+
       <!-- FLEX Legend and balance plot -->
       <div style="display: flex; gap: 13em; justify-content: center;">
         <div id="legend" style="margin-left: -50px;">
-              <Legend 
+              <Legend
                 diamond_dat={dat.counts}
                 DiamondHeight={DiamondHeight}
                 max_count_log={max_count_log || 5}
               />
         </div>
         <div id="balance">
-              <DivergingBarChart 
+              <DivergingBarChart
                 data={balanceData}
-                DiamondHeight={DiamondHeight} 
+                DiamondHeight={DiamondHeight}
                 DiamondWidth={DiamondWidth}
               />
         </div>
       </div>
     </div>
-    
+
     <!-- Wordshift -->
     <div style="margin-top:60px; overflow: visible;">
       <div id="wordshift" style="overflow: visible;">
-            <Wordshift 
-              barData={barData} 
+            <Wordshift
+              barData={barData}
               DashboardHeight={DashboardHeight}
               DashboardWidth={DashboardWidth}
               xDomain={wordshiftXDomain}
               width={640}
-              marginLeft={140}
+              marginLeft={110}
             />
       </div>
     </div>
