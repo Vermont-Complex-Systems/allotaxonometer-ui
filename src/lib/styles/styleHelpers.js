@@ -19,10 +19,10 @@ export const colors = {
 
 export const fonts = {
   family: '"EB Garamond", "Garamond", "Century Schoolbook L", "URW Bookman L", "Bookman Old Style", "Times", serif',
-  sizes: { 
-    xs: "10px", 
-    sm: "12px", 
-    md: "14px", 
+  sizes: {
+    xs: "10px",
+    sm: "12px",
+    md: "14px",
     lg: "16px",
     xl: "18px"
   }
@@ -43,13 +43,13 @@ export const axisStyles = {
     fill: colors.darkergrey,
     textAnchor: "middle"
   }),
-  
+
   tickLabel: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.sm,
     fill: colors.darkergrey,
   }),
-  
+
   helperText: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.sm,
@@ -57,7 +57,7 @@ export const axisStyles = {
     textAnchor: "middle",
     opacity: "0.8"
   }),
-  
+
   tickLine: () => style({
     stroke: colors.darkgrey,
     strokeWidth: "0.5"
@@ -68,27 +68,27 @@ export const axisStyles = {
 export const diamondStyles = {
   label: () => style({
     fontFamily: fonts.family,
-    fontSize: fonts.sizes.sm,
+    fontSize: fonts.sizes.md,
     fill: colors.darkergrey
   }),
-  
+
   middleLine: () => style({
     stroke: colors.verydarkgrey,
     strokeWidth: "0.5"
   }),
-  
+
   gridLine: () => style({
     stroke: colors.darkergrey,
     strokeDasharray: "1, 3"
   }),
-  
+
   contourLine: () => style({
     fill: "none",
     stroke: colors.verydarkgrey,
     strokeWidth: "0.25",
     strokeOpacity: "0.9"
   }),
-  
+
   cellStroke: () => style({
     stroke: colors.darkergrey,
     strokeWidth: "1.18",
@@ -104,14 +104,14 @@ export const legendStyles = {
     fill: colors.verydarkgrey,
     textAnchor: "start"
   }),
-  
+
   title: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.md,
     fill: colors.verydarkgrey,
     textAnchor: "start"
   }),
-  
+
   colorRect: () => style({
     stroke: "black",
     strokeWidth: "0.65",
@@ -126,27 +126,27 @@ export const wordshiftStyles = {
     fontSize: fonts.sizes.md,
     fill: colors.verydarkgrey
   }),
-  
+
   axisTitle: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.lg,
     fill: colors.verydarkgrey,
     textAnchor: "middle"
   }),
-  
+
   nameLabel: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.md,
     fill: colors.verydarkgrey
   }),
-  
+
   numbersLabel: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.md,
     fill: colors.darkgrey,
     opacity: "0.7"
   }),
-  
+
   gridLine: () => style({
     stroke: "currentColor",
     strokeOpacity: "0.1"
@@ -161,7 +161,7 @@ export const balanceStyles = {
     fill: colors.darkergrey,
     opacity: "0.5"
   }),
-  
+
   yLabel: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.xs,
@@ -176,13 +176,13 @@ export const dashboardStyles = {
     fontSize: fonts.sizes.md,
     color: colors.darkgrey
   }),
-  
+
   alphaText: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.md,
     color: colors.darkgrey
   }),
-  
+
   title: () => style({
     fontFamily: fonts.family,
     fontSize: fonts.sizes.lg,
