@@ -46,13 +46,13 @@ export const axisStyles = {
 
   tickLabel: () => style({
     fontFamily: fonts.family,
-    fontSize: fonts.sizes.sm,
+    fontSize: fonts.sizes.md,
     fill: colors.darkergrey,
   }),
 
   helperText: () => style({
     fontFamily: fonts.family,
-    fontSize: fonts.sizes.sm,
+    fontSize: fonts.sizes.md,
     fill: colors.darkgrey,
     textAnchor: "middle",
     opacity: "0.8"
