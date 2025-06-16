@@ -18,10 +18,10 @@
   --allo-superdarkgrey: rgb(26, 26, 26);
   --allo-reallyverdarkgrey: rgb(13, 13, 13);
   --allo-orange: rgb(255, 116, 0);
-  
+
   /* Typography */
-  --allo-font-family: "EB Garamond", "Garamond", "Century Schoolbook L", "URW Bookman L", "Bookman Old Style", "Times", serif;
-  
+  --allo-font-family: '"EB Garamond", "Garamond", "Century Schoolbook L", "URW Bookman L", "Bookman Old Style", "Times", serif';
+
   /* Font sizes */
   --allo-font-xs: 10px;
   --allo-font-sm: 12px;

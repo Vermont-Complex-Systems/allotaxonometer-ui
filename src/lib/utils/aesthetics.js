@@ -4,6 +4,12 @@ function rgbArrayToCss(rgbArray) {
     return `rgb(${r}, ${g}, ${b})`;
   }
 
+export function style(props) {
+  return Object.entries(props)
+    .map(([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value}`)
+    .join('; ');
+}
+
   // // imported from matlab version. Normalized RGB color definitions
   const rawColors = {
     blue: [43, 103, 198].map(v => v / 255),
@@ -41,5 +47,15 @@ function rgbArrayToCss(rgbArray) {
     css: cssColors     // e.g., colors.css.blue → "rgb(43, 103, 198)"
   };
 
-  // System font stack in order of preference
-  export const alloFonts = `"EB Garamond", "Garamond", "Century Schoolbook L", "URW Bookman L", "Bookman Old Style", "Times", serif`;
+// System font stack in order of preference
+export const alloFonts = {
+  family: `"EB Garamond", "Garamond", "Century Schoolbook L", "URW Bookman L", "Bookman Old Style", "Times", serif`,
+  sizes: {
+    xs: "10px",
+    sm: "12px",
+    md: "14px",
+    lg: "16px",
+    xl: "18px"
+  }
+
+}

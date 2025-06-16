@@ -18,11 +18,11 @@ describe('Full Pipeline Integration', () => {
     Dashboard = module.Dashboard;
     
     // Load real data from JSON files
+    const boys1895 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1895.json', 'utf8'));
     const boys1968 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1968.json', 'utf8'));
-    const boys2018 = JSON.parse(fs.readFileSync('tests/fixtures/boys-2018.json', 'utf8'));
     
-    testData1 = boys1968;
-    testData2 = boys2018;
+    testData1 = boys1895;
+    testData2 = boys1968;
   });
 
   test('data processing pipeline completes successfully', () => {
@@ -150,7 +150,7 @@ describe('Full Pipeline Integration', () => {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Full Pipeline Test - Boys Names 1968 vs 2018</title>
+  <title>Full Pipeline Test - Boys Names 1885 vs 1968</title>
   <style>
     body { font-family: sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
     .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
