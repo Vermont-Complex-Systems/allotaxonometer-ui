@@ -150,7 +150,7 @@ describe('Full Pipeline Integration', () => {
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Full Pipeline Test - Boys Names 1968 vs 2018</title>
+  <title>Full Pipeline Test - Boys Names 1885 vs 1968</title>
   <style>
     body { font-family: sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
     .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }

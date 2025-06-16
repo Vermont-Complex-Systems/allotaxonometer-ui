@@ -67,7 +67,6 @@
     showWordshift = true,
     showDivergingBar = true,
     showLegend = true,
-    ...restProps
   }: DashboardProps = $props();
 
   let max_shift = $derived(
@@ -80,15 +79,17 @@
 </script>
 
 <div id="allotaxonometer-dashboard" style="position: relative; margin: 0; padding: 0;">
-  <div style="display:flex; flex-wrap: wrap; align-items:center; justify-content: center; row-gap: 50px; margin-left: 100px">
-    <div id="diamond-group"  style="margin-top:20px">
+  <div style="display:flex; flex-wrap: wrap; align-items:center; justify-content: center; row-gap: 50px;">
+    <div id="diamond-group" style="margin-top:20px; margin-right: -50px;">
       <!-- Titles with instrument text positioned relative to left title -->
       <div style="display:flex; gap: 10em; justify-content: center; margin-bottom: -70px; margin-right: 70px; position: relative;">
           <div style="position: relative;">
             <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[0]}</div>
             <!-- Instrument text positioned at far left edge -->
-            <div style="position: absolute; top: 100%; left: -12em; margin-top: 2.5em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey};">{instrumentText}</div>
-            <div style="position: absolute; top: 100%; left: -12em; margin-top: 3.5em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey};">α = {alpha}</div>
+            <div style="position: absolute; top: 100%; left: -14em; margin-top: 2.5em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey}; width: 300px; line-height: 1;">
+            <div style="margin-bottom: 0.5em;">{instrumentText}</div>
+            <div>α = {alpha}</div>
+          </div>
           </div>
           <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[1]}</div>
       </div>
