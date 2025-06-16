@@ -23,6 +23,7 @@
     DashboardWidth?: number;
     DiamondHeight?: number;
     DiamondWidth?: number;
+    WordshiftWidth?: number;
     marginInner?: number;         // Replaces margin.inner
     marginDiamond?: number;       // Replaces margin.diamond
     max_count_log?: number;       // For legend
@@ -58,15 +59,10 @@
     DashboardWidth = 1200,
     DiamondHeight = 600,
     DiamondWidth = 600,
+    WordshiftWidth = 640,
     marginInner = 160,
     marginDiamond = 40,
     max_count_log = undefined,
-    class: className = '',
-    style = '',
-    showDiamond = true,
-    showWordshift = true,
-    showDivergingBar = true,
-    showLegend = true,
   }: DashboardProps = $props();
 
   let max_shift = $derived(
@@ -128,7 +124,7 @@
               DashboardHeight={DashboardHeight}
               DashboardWidth={DashboardWidth}
               xDomain={wordshiftXDomain}
-              width={640}
+              width={WordshiftWidth}
               marginLeft={110}
             />
       </div>

@@ -1,6 +1,9 @@
 <script>
     import * as d3 from "d3";
-    
+    import { ModeWatcher } from "mode-watcher";
+    import { toggleMode } from "mode-watcher";
+    import SunIcon from "@lucide/svelte/icons/sun";
+    import MoonIcon from "@lucide/svelte/icons/moon";
     import { Dashboard } from 'allotaxonometer-ui';
     import { combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, balanceDat } from 'allotaxonometer-ui';
     import { Slider } from "$lib/components/ui/slider/index.js";
@@ -25,13 +28,17 @@
     let sys2 = $state(boys1968);
     let alpha = $state(0.58);
     let title = $state(['Boys 1895', 'Boys 1968']); // Make this mutable
+    
+    let sidebarCollapsed = $state(false);
+    let isDarkMode = $state(false);
 
     let DashboardHeight = 815;
-    let DashboardWidth = 1200;
+    let DashboardWidth = $derived(sidebarCollapsed ? 1200 : 900);
     let DiamondHeight = 600;
     let DiamondWidth = DiamondHeight;
     let marginInner = 160;
     let marginDiamond = 40;
+    let WordshiftWidth = $derived(sidebarCollapsed ? 550 : 400);
 
     const alphas = d3.range(0,18).map(v => +(v/12).toFixed(2)).concat([1, 2, 5, Infinity]);
     let alphaIndex = $state(7); // Start at 0.58
@@ -40,7 +47,6 @@
         alpha = alphas[alphaIndex];
     });
 
-    let sidebarCollapsed = $state(false);
 
     // File upload handling
     let fileInput1, fileInput2;
@@ -82,7 +88,22 @@
     let isDataReady = $derived(dat && barData && balanceData && me && rtd);
 </script>
 
-<div class="p-30 ml-15">
+<ModeWatcher />
+
+<!-- Top-right dark mode toggle -->
+<div class="fixed top-4 right-4 z-50">
+  <Button onclick={toggleMode} variant="outline" size="icon">
+    <SunIcon
+      class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+    />
+    <MoonIcon
+      class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+    />
+    <span class="sr-only">Toggle theme</span>
+  </Button>
+</div>
+
+<div class="bg-white dark:bg-black text-black dark:text-white mt-25 ml-30">
 <SidebarProvider>
     <div class="flex h-screen w-full">
         <!-- Sidebar -->
@@ -237,6 +258,7 @@
                     {DiamondWidth}
                     {marginInner}
                     {marginDiamond}
+                    {WordshiftWidth}
                     xDomain={[-max_shift * 1.5, max_shift * 1.5]}
                     class="dashboard"
                 />
@@ -257,4 +279,9 @@
     :global(.sidebar) {
         transition: width 0.3s ease-in-out;
     }
+
+    :global(body) {
+      overflow-y: hidden; /* Hides vertical scrollbar and prevents vertical scrolling on the body */
+    }
+
 </style>
