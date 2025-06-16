@@ -1,4 +1,3 @@
-import structuredClone  from '@ungap/structured-clone';
 import { group, extent } from "d3-array";
 
 import { matlab_sort, which, rin, rank_maxlog10 } from "./utils_helpers.js";
@@ -97,8 +96,8 @@ export default function diamond_count(mixedelements, wordshift) {
   mixedelements[1]['ranks']  =  indices_deltas.map(i => mixedelements[1]['ranks'][i])
   mixedelements[1]['probs'] =  indices_deltas.map(i => mixedelements[1]['probs'][i])
   
-  const deltas_loss = structuredClone(deltas)
-  const deltas_gain = structuredClone(deltas)
+  const deltas_loss = [...deltas]
+  const deltas_gain = [...deltas]
 
   which(mixedelements[0]['ranks'].map((d,i) => mixedelements[0]['ranks'][i] > mixedelements[1]['ranks'][i])).map(e => deltas_loss[e] = -1)
   which(mixedelements[0]['ranks'].map((d,i) => mixedelements[1]['ranks'][i] < mixedelements[1]['ranks'][i])).map(e => deltas_gain[e] = -1)
