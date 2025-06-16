@@ -1,8 +1,33 @@
 import { mount } from 'svelte';
-import App from './App.svelte';
+import './src/app.css'; // Import Tailwind styles
 
-const app = mount(App, {
-  target: document.getElementById('app')
+// App registry
+const apps = {
+  vanilla: () => import('./apps/VanillaApp.svelte'),
+  shadcn: () => import('./apps/ShadcnApp.svelte')
+};
+
+// Simple routing based on hash
+const getAppType = () => {
+  const hash = window.location.hash.slice(1);
+  return hash in apps ? hash : 'vanilla';
+};
+
+async function loadApp() {
+  const appType = getAppType();
+  const AppComponent = await apps[appType]();
+  
+  mount(AppComponent.default, {
+    target: document.getElementById('app')
+  });
+}
+
+// Initial load
+loadApp();
+
+// Handle hash changes
+window.addEventListener('hashchange', () => {
+  // Clear the app container and reload
+  document.getElementById('app').innerHTML = '';
+  loadApp();
 });
-
-export default app;

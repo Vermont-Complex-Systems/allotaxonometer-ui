@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"]
+    },
+    "allowJs": true,
+    "checkJs": false,
+    "strict": false,
+    "moduleResolution": "bundler",
+    "target": "ES2020",
+    "module": "ESNext",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*", "*.js", "*.svelte", "apps/**/*"],
+  "exclude": ["node_modules"]
+}

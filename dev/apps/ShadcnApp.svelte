@@ -2,8 +2,8 @@
     import * as d3 from "d3";
     import { Dashboard } from 'allotaxonometer-ui';
     import { combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, balanceDat } from 'allotaxonometer-ui';
-    import boys1895 from '../tests/fixtures/boys-1895.json';
-    import boys1968 from '../tests/fixtures/boys-1968.json';
+    import boys1895 from '../../tests/fixtures/boys-1895.json';
+    import boys1968 from '../../tests/fixtures/boys-1968.json';
 
     // Process the data directly
     let sys1 = boys1895;
