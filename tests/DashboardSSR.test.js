@@ -18,11 +18,11 @@ describe('Full Pipeline Integration', () => {
     Dashboard = module.Dashboard;
     
     // Load real data from JSON files
+    const boys1895 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1895.json', 'utf8'));
     const boys1968 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1968.json', 'utf8'));
-    const boys2018 = JSON.parse(fs.readFileSync('tests/fixtures/boys-2018.json', 'utf8'));
     
-    testData1 = boys1968;
-    testData2 = boys2018;
+    testData1 = boys1895;
+    testData2 = boys1968;
   });
 
   test('data processing pipeline completes successfully', () => {
