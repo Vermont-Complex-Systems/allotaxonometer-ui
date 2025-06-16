@@ -84,14 +84,14 @@
       <!-- Titles with instrument text positioned relative to left title -->
       <div style="display:flex; gap: 10em; justify-content: center; margin-bottom: -70px; margin-right: 70px; position: relative;">
           <div style="position: relative;">
-            <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[0]}</div>
+            <div style="font-family: {alloFonts.family}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[0]}</div>
             <!-- Instrument text positioned at far left edge -->
-            <div style="position: absolute; top: 100%; left: -8em; margin-top: 3em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey}; width: 150px; line-height: 1;">
+            <div style="position: absolute; top: 100%; left: -8em; margin-top: 3em; font-family: {alloFonts.family}; font-size: 14px; color: {alloColors.css.darkgrey}; width: 150px; line-height: 1;">
             <div style="margin-bottom: 0.5em;">{instrumentText}</div>
             <div>α = {alpha}</div>
           </div>
           </div>
-          <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[1]}</div>
+          <div style="font-family: {alloFonts.family}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[1]}</div>
       </div>
 
       <div id="diamondplot">

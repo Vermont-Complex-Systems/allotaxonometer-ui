@@ -1,8 +1,8 @@
 <script>
     import { alloColors, alloFonts, style } from '../../utils/aesthetics.js';
-    
+
     let { innerHeight, scale, title } = $props();
-    
+
     let logFormat10 = $derived(scale.tickFormat());
     let yTicks = $derived(
     scale.ticks().filter(t => t >= 1 && Number.isInteger(Math.log10(t)))
@@ -17,8 +17,8 @@
 
     let helperText = () => style({
             fontFamily: alloFonts.family,
-            fontSize: alloFonts.sizes.sm,
-            fill: alloColors.css.darkergrey,
+            fontSize: alloFonts.sizes.md,
+            fill: alloColors.css.darkgrey,
             textAnchor: "middle"
         })
 </script>
@@ -26,7 +26,7 @@
 <g class='axis y' transform="translate({innerHeight}, 0) scale(-1, 1)">
     {#each yTicks as tick, index}
         <g transform="translate(0, {scale(tick)})">
-            <line x1="0" x2="-6" y1="0" y2="0" stroke={alloColors.css.darkergreyy} stroke-width= "0.5"></line>
+            <line x1="0" x2="-6" y1="0" y2="0" stroke={alloColors.css.darkergrey} stroke-width= "0.5"></line>
         </g>
         <g transform="translate(0, {scale(tick)}) rotate(45)">
             <text dx="-5" dy="13"  text-anchor="end" font-family={alloFonts.family} font-size={alloFonts.sizes.md} fill={alloColors.css.darkergrey}>{logFormat10(tick)}</text>

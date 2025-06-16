@@ -2,8 +2,8 @@
     import * as d3 from "d3";
     import { alloColors, alloFonts } from '../../utils/aesthetics.js';
 
-    let { 
-        barData, 
+    let {
+        barData,
         x = d => d.metric,
         y = d => d.type,
         xDomain,
@@ -19,40 +19,40 @@
         colors = [alloColors.css.lightgrey, alloColors.css.paleblue],
         barHeightFactor = 0.7
     } = $props();
-    
+
     // Compute values (matching D3 version exactly)
     let X = $derived(d3.map(barData, x));
     let Y = $derived(d3.map(barData, y));
-    
+
     // Compute domains
     let computedXDomain = $derived(xDomain || d3.extent(X));
     let yDomain = $derived(new d3.InternSet(Y));
-    
+
     // Match D3 dimensions exactly
     const xAxisYOffset = 10; // Space below x-axis (from original)
     const bandHeight = 18;   // Fixed band height (from original)
     const shiftSvgBy = 12;   // shift svg up to align with system titles
     const barYOffset = 10;   // Additional offset just for bars
-    
+
     let compactHeight = $derived(yDomain.size * bandHeight);
     let innerWidth = $derived(width - marginLeft - marginRight);
     let innerHeight = $derived(compactHeight + xAxisYOffset);
     let computedHeight = $derived(innerHeight + marginTop + marginBottom);
-    
+
     // Compute ranges exactly like D3
     let xRange = $derived([0, innerWidth]);
     let yRange = $derived([xAxisYOffset + barYOffset, xAxisYOffset + barYOffset + compactHeight]);
-    
+
     // Filter indices and create lookup
     let I = $derived(d3.range(X.length).filter(i => yDomain.has(Y[i])));
     let YX = $derived(d3.rollup(I, ([i]) => X[i], i => Y[i]));
-    
+
     // Scales
     let xScale = $derived(d3.scaleLinear(computedXDomain, xRange));
     let yScale = $derived(d3.scaleBand().domain(yDomain).range(yRange).padding(yPadding));
     let format = $derived(xScale.tickFormat(100, xFormat));
     let xTicks = $derived(xScale.ticks(width / 80));
-    
+
     // Helper function matching D3 logic exactly
     function parseLabelData(label) {
         const splitIndex = label.indexOf(' ');
@@ -74,8 +74,8 @@
     let finalHeight = $derived(height || computedHeight);
 </script>
 
-<svg 
-    {width} 
+<svg
+    {width}
     height={finalHeight}
     viewBox="0 0 {width} {finalHeight}"
     style="overflow: visible; display: block;"
@@ -86,40 +86,40 @@
         <g class='wordshift-axis x' transform="translate(0, {xAxisYOffset})">
             {#each xTicks as tick}
                 <!-- Original tick marks (short) -->
-                <line 
-                    x1={xScale(tick)} 
-                    y1="0" 
+                <line
+                    x1={xScale(tick)}
+                    y1="0"
                     x2={xScale(tick)}
                     y2="6"
                     style="stroke: currentColor; stroke-width: 1;"
                 />
                 <!-- Extended grid lines (cloned effect) -->
-                <line 
+                <line
                     class="wordshift-grid-line"
-                    x1={xScale(tick)} 
-                    y1="0" 
+                    x1={xScale(tick)}
+                    y1="0"
                     x2={xScale(tick)}
-                    y2={innerHeight - xAxisYOffset + barYOffset} 
+                    y2={innerHeight - xAxisYOffset + barYOffset}
                     style={tick === 0 ? `stroke: ${alloColors.css.verydarkgrey}; stroke-width: 1; stroke-opacity: 0.8;` : `stroke: currentColor; stroke-opacity: 0.1;`}
                 />
                 <!-- Tick labels -->
-                <text 
-                    x={xScale(tick)} 
-                    y="-12" 
+                <text
+                    x={xScale(tick)}
+                    y="-12"
                     text-anchor="middle"
-                    style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.verydarkgrey};"
+                    style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.verydarkgrey};"
                 >{format(tick)}</text>
             {/each}
-            
+
             <!-- X-axis label -->
-            <text 
-                x={xScale(0)} 
-                y="-35" 
+            <text
+                x={xScale(0)}
+                y="-35"
                 text-anchor="middle"
-                style="font-family: {alloFonts}; font-size: 16px; fill: {alloColors.css.verydarkgrey};"
+                style="font-family: {alloFonts.family}; font-size: 16px; fill: {alloColors.css.verydarkgrey};"
             >{xLabel}</text>
         </g>
-        
+
         <!-- Bars -->
         {#each I as i}
             <rect
@@ -129,10 +129,10 @@
                 fill={colors[X[i] > 0 ? colors.length - 1 : 0]}
                 width={Math.abs(xScale(X[i]) - xScale(0))}
                 height={yScale.bandwidth() * barHeightFactor}
-                style="mix-blend-mode: multiply;" 
+                style="mix-blend-mode: multiply;"
             />
         {/each}
-        
+
         <!-- Y-axis labels with names and numbers -->
         <g class="wordshift-y-axis" transform="translate({xScale(0)}, 0)">
             {#each yScale.domain() as label}
@@ -140,20 +140,20 @@
                 {@const xValue = YX.get(label)}
                 <g class="wordshift-label-group" transform="translate(0, {yScale(label) + yScale.bandwidth() / 2})">
                     <!-- Name text on the normal side (matching D3 positioning) -->
-                    <text 
+                    <text
                         x={xValue > 0 ? 6 : -6}
                         dy="0.32em"
                         text-anchor={xValue > 0 ? "start" : "end"}
-                        style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.verydarkgrey};"
+                        style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.verydarkgrey};"
                     >{labelData.name_y}</text>
-                    
+
                     <!-- Numbers text on the opposite side (matching D3 positioning) -->
                     {#if labelData.numbers_y}
-                        <text 
+                        <text
                             x={xValue > 0 ? -6 : 6}
                             dy="0.32em"
                             text-anchor={xValue > 0 ? "end" : "start"}
-                            style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.darkergrey}; opacity: 0.5;"
+                            style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.darkergrey}; opacity: 0.5;"
                         >{labelData.numbers_y}</text>
                     {/if}
                 </g>

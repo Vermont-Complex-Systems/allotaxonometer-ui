@@ -1,9 +1,9 @@
 <script>
     import { scaleOrdinal, range, interpolateInferno, scaleBand, rgb } from "d3";
     import { alloColors, alloFonts } from '../../utils/aesthetics.js';
-    
-    let { 
-        diamond_dat, 
+
+    let {
+        diamond_dat,
         max_count_log,
         tickSize = 0,
         height =  44 + tickSize,
@@ -26,8 +26,8 @@
         .rangeRound([marginLeft - 40, width - 90]));
 </script>
 
-<svg 
-    {width} 
+<svg
+    {width}
     {height}
     viewBox="0 0 {width} {height}"
     style="overflow: visible; display: block;"
@@ -51,22 +51,22 @@
             <g class="tick" transform="translate({x2(tick)}, 0)">
                 <text
                     dx="30"
-                    dy="-30" 
+                    dy="-30"
                     transform="rotate(90)"
-                    style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.verydarkgrey}; text-anchor: start;"
+                    style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.verydarkgrey}; text-anchor: start;"
                 >{tick}</text>
             </g>
         {/each}
-        
+
         <!-- Title gets SAME positioning as ticks -->
         <text
             class="title"
-            x={marginLeft - 25}  
+            x={marginLeft - 25}
             y={marginTop + marginBottom}
-            dx="30"             
-            dy="-5"             
-            transform="rotate(90)" 
-            style="font-family: {alloFonts}; font-size: 14px; fill: {alloColors.css.verydarkgrey}; text-anchor: start;"
+            dx="30"
+            dy="-5"
+            transform="rotate(90)"
+            style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.verydarkgrey}; text-anchor: start;"
         >Counts per cell</text>
     </g>
 </svg>
