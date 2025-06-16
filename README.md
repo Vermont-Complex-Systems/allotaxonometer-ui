@@ -8,12 +8,6 @@ Headless UI components for allotaxonometer visualizations built with Svelte 5.
 npm install allotaxonometer-ui
 ```
 
-Make sure you have these installed:
-
-```bash
-npm install svelte d3 allotaxonometer @ungap/structured-clone
-```
-
 ## Usage
 
 ```svelte

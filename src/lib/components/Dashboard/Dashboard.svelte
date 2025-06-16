@@ -13,7 +13,7 @@
     divnorm?: number;             // Replaces rtd
     barData?: any[];
     balanceData?: any[];          // Pre-calculated balance data
-    
+
     // Configuration props
     title?: string[];
     maxlog10?: number;
@@ -27,17 +27,17 @@
     marginDiamond?: number;       // Replaces margin.diamond
     max_count_log?: number;       // For legend
     xDomain?: [number, number]; // Optional x-axis domain for Wordshift
-    
+
     // Style props
     class?: string;
     style?: string;
-    
+
     // Component visibility
     showDiamond?: boolean;
     showWordshift?: boolean;
     showDivergingBar?: boolean;
     showLegend?: boolean;
-    
+
     // Instrument text
     instrumentText?: string;
   }
@@ -67,68 +67,69 @@
     showWordshift = true,
     showDivergingBar = true,
     showLegend = true,
-    ...restProps
   }: DashboardProps = $props();
 
   let max_shift = $derived(
-    barData.length > 0 
-      ? Math.max(...barData.map(d => Math.abs(d.metric))) 
+    barData.length > 0
+      ? Math.max(...barData.map(d => Math.abs(d.metric)))
       : 1
   );
 
   let wordshiftXDomain = $derived(xDomain || [-max_shift * 1.5, max_shift * 1.5]);
 </script>
 
-<div class="allotaxonometer-dashboard" style="position: relative; margin: 0; padding: 0;">
+<div id="allotaxonometer-dashboard" style="position: relative; margin: 0; padding: 0;">
   <div style="display:flex; flex-wrap: wrap; align-items:center; justify-content: center; row-gap: 50px;">
-    <div style="margin-top:20px">
+    <div id="diamond-group" style="margin-top:20px; margin-right: -50px;">
       <!-- Titles with instrument text positioned relative to left title -->
       <div style="display:flex; gap: 10em; justify-content: center; margin-bottom: -70px; margin-right: 70px; position: relative;">
           <div style="position: relative;">
             <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[0]}</div>
             <!-- Instrument text positioned at far left edge -->
-            <div style="position: absolute; top: 100%; left: -12em; margin-top: 2.5em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey};">{instrumentText}</div>
-            <div style="position: absolute; top: 100%; left: -12em; margin-top: 3.5em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey};">α = {alpha}</div>
+            <div style="position: absolute; top: 100%; left: -8em; margin-top: 3em; font-family: {alloFonts}; font-size: 14px; color: {alloColors.css.darkgrey}; width: 150px; line-height: 1;">
+            <div style="margin-bottom: 0.5em;">{instrumentText}</div>
+            <div>α = {alpha}</div>
+          </div>
           </div>
           <div style="font-family: {alloFonts}; font-size: 16px; color: {alloColors.css.superdarkgrey};">{title[1]}</div>
       </div>
-      
+
       <div id="diamondplot">
-            <Diamond 
-              {dat} {alpha} {divnorm} {title} {maxlog10} 
+            <Diamond
+              {dat} {alpha} {divnorm} {title} {maxlog10}
               {DiamondHeight} {marginInner} {marginDiamond}
             />
       </div>
-      
+
       <!-- FLEX Legend and balance plot -->
       <div style="display: flex; gap: 13em; justify-content: center;">
         <div id="legend" style="margin-left: -50px;">
-              <Legend 
+              <Legend
                 diamond_dat={dat.counts}
                 DiamondHeight={DiamondHeight}
                 max_count_log={max_count_log || 5}
               />
         </div>
         <div id="balance">
-              <DivergingBarChart 
+              <DivergingBarChart
                 data={balanceData}
-                DiamondHeight={DiamondHeight} 
+                DiamondHeight={DiamondHeight}
                 DiamondWidth={DiamondWidth}
               />
         </div>
       </div>
     </div>
-    
+
     <!-- Wordshift -->
     <div style="margin-top:60px; overflow: visible;">
       <div id="wordshift" style="overflow: visible;">
-            <Wordshift 
-              barData={barData} 
+            <Wordshift
+              barData={barData}
               DashboardHeight={DashboardHeight}
               DashboardWidth={DashboardWidth}
               xDomain={wordshiftXDomain}
               width={640}
-              marginLeft={140}
+              marginLeft={110}
             />
       </div>
     </div>

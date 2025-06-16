@@ -1,7 +1,7 @@
 <script>
     import * as d3 from "d3";
 
-    let { alpha, maxlog10, divnorm, DiamondInnerHeight } = $props(); 
+    let { alpha, maxlog10, divnorm, DiamondInnerHeight } = $props();
 
     function alpha_norm_type2(x1, x2, alpha) {
         if (alpha == 0) {
@@ -21,7 +21,7 @@
         for (let i = 0; i < Ninset; i++) {
             for (let j = 0; j < Ninset; j++) {
                 const divElem = alpha_norm_type2(1 / tmpr1[i], 1 / tmpr2[j], alpha);
-                deltamatrix[i][j] = divElem / divnorm; 
+                deltamatrix[i][j] = divElem / divnorm;
             }
 
             deltamatrix[i][i] = -1;
@@ -51,7 +51,7 @@
                     const x1 = chart2val(tmpr1[index]);
                     const x2 = chart2val(tmpr2[index]);
                     const tmpxrot = Math.abs(x2 - x1) / Math.sqrt(2);
-                    
+
                     if (Math.abs(tmpxrot) >= 0.1 & x1 != maxlog10 & x2 != 0 & x1 != 0 & x2 != maxlog10) {
                         filteredPairs.push([x1, x2]);
                     }
@@ -69,27 +69,27 @@
         const Ninset = 10 ** 3;
         const tmpr1 = d3.range(0, 1000).map(d => Math.pow(10, d / 999 * 5));
         const tmpr2 = d3.range(0, 1000).map(d => Math.pow(10, d / 999 * 5));
-        
+
         const Ncontours = 10;
         const scale = d3.scaleLinear()
             .domain([0, Ncontours + 1])
             .range([1, tmpr1.length]);
-        
+
         const contour_indices = d3.range(Ncontours + 2).map(i => Math.round(scale(i)));
         const grid = make_grid(Ninset, tmpr1, tmpr2, alpha, divnorm);
         const indices = contour_indices.slice(1, -1);
         const lastRow = grid[grid.length - 1];
         const heights = indices.map(index => lastRow[index]);
-        
+
         const logTmpr = tmpr1.map(Math.log10);
-        
+
         const contourGenerator = d3.contours()
             .size([logTmpr.length, logTmpr.length])
             .thresholds(heights);
-        
+
         const flatDeltamatrix = grid.flat();
-        const tmpcontours = contourGenerator(flatDeltamatrix);  
-        
+        const tmpcontours = contourGenerator(flatDeltamatrix);
+
         return filter_contours(tmpcontours, Ninset, maxlog10);
     }
 
@@ -105,11 +105,11 @@
 
 <g class="contours">
     {#each mycontours as contour, index}
-        <path 
+        <path
             fill="none"
             stroke="grey"
             d={pathData(contour)}
-            stroke-width="0.9"
+            stroke-width="0.55"
             stroke-opacity="0.9">
         </path>
     {/each}
