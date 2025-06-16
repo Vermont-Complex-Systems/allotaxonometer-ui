@@ -79,9 +79,9 @@
   let wordshiftXDomain = $derived(xDomain || [-max_shift * 1.5, max_shift * 1.5]);
 </script>
 
-<div class="allotaxonometer-dashboard" style="position: relative; margin: 0; padding: 0;">
-  <div style="display:flex; flex-wrap: wrap; align-items:center; justify-content: center; row-gap: 50px;">
-    <div style="margin-top:20px">
+<div id="allotaxonometer-dashboard" style="position: relative; margin: 0; padding: 0;">
+  <div style="display:flex; flex-wrap: wrap; align-items:center; justify-content: center; row-gap: 50px; margin-left: 100px">
+    <div id="diamond-group"  style="margin-top:20px">
       <!-- Titles with instrument text positioned relative to left title -->
       <div style="display:flex; gap: 10em; justify-content: center; margin-bottom: -70px; margin-right: 70px; position: relative;">
           <div style="position: relative;">
