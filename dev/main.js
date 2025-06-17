@@ -4,7 +4,8 @@ import './src/app.css'; // Import Tailwind styles
 // App registry
 const apps = {
   vanilla: () => import('./apps/VanillaApp.svelte'),
-  shadcn: () => import('./apps/ShadcnApp.svelte')
+  shadcn: () => import('./apps/ShadcnApp.svelte'),
+  bitsui: () => import('./apps/BitsuiApp.svelte')
 };
 
 // Simple routing based on hash

@@ -27,9 +27,9 @@ export function style(props) {
 
     grey: [1, 1, 1].map(v => v * 0.75),
     darkgrey: [1, 1, 1].map(v => v * 0.55),
-    darkergrey: [1, 1, 1].map(v => v * 0.35),
-    verydarkgrey: [1, 1, 1].map(v => v * 0.15),
-    superdarkgrey: [1, 1, 1].map(v => v * 0.10),
+    darkergrey: [1, 1, 1].map(v => v * 0.50),
+    verydarkgrey: [1, 1, 1].map(v => v * 0.55),
+    superdarkgrey: [1, 1, 1].map(v => v * 0.55),
     reallyverdarkgrey: [1, 1, 1].map(v => v * 0.05),
 
     orange: [255, 116, 0].map(v => v / 255)
