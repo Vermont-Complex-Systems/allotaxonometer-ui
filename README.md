@@ -8,7 +8,8 @@
 <p>
 
 - Visit our [single-page web application](https://vermont-complex-systems.github.io/complex-stories/allotaxonometry) to try it out online.
-- Use [py-allotax](https://github.com/compstorylab/py-allotax) to use allotaxonometry at scale ([:octocat: github](https://github.com/compstorylab/py-allotax))
+- Use [py-allotax](https://github.com/compstorylab/py-allotax) to use allotaxonometry programmatically ([:octocat: github](https://github.com/compstorylab/py-allotax))
+- We also maintain a [matlab version](https://gitlab.com/compstorylab/allotaxonometer) to use allotaxonometry at scale.
 
 Headless UI components for allotaxonometer visualizations built with Svelte 5.
 
