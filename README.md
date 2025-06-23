@@ -7,7 +7,7 @@
 
 <p>
 
-- Visit our [single-page web application]([https://allotax.vercel.app/](https://vermont-complex-systems.github.io/complex-stories/allotaxonometry)) to try it out online.
+- Visit our [single-page web application](https://vermont-complex-systems.github.io/complex-stories/allotaxonometry) to try it out online.
 - Use [py-allotax](https://github.com/compstorylab/py-allotax) to use allotaxonometry at scale ([:octocat: github](https://github.com/compstorylab/py-allotax))
 
 Headless UI components for allotaxonometer visualizations built with Svelte 5.
