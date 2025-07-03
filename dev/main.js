@@ -5,7 +5,9 @@ import './src/app.css'; // Import Tailwind styles
 const apps = {
   vanilla: () => import('./apps/VanillaApp.svelte'),
   shadcn: () => import('./apps/ShadcnApp.svelte'),
-  bitsui: () => import('./apps/BitsuiApp.svelte')
+  bitsui: () => import('./apps/BitsuiApp.svelte'),
+  class: () => import('./apps/ClassApp.svelte'),
+  dash: () => import('./apps/DashApp.svelte')
 };
 
 // Simple routing based on hash

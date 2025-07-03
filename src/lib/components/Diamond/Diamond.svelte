@@ -30,7 +30,17 @@
         const cumbin = d3.range(0, ncells, 1.5);
         const relevant_types = [];
 
+        // Count how often each type appears across all cells (for selectivity)
+        const type_frequency = new Map();
+        diamond_dat.filter(d => d.value > 0).forEach(d => {
+            d.types.split(",").forEach(type => {
+                const clean_type = type.trim();
+                type_frequency.set(clean_type, (type_frequency.get(clean_type) || 0) + 1);
+            });
+        });
+
         for (let sys of ["right", "left"]) {
+            let sys_count = 0;
             for (let i = 1; i < cumbin.length; i++) {
                 const filtered_dat = diamond_dat.filter(d => d.value > 0 && d.which_sys == sys)
                                     .filter(d => d.coord_on_diag >= cumbin[i-1] &&
@@ -41,76 +51,99 @@
                     const max_dist = cos_dists.reduce((a, b) => Math.max(a, b));
                     const max_dist_idx = cos_dists.indexOf(max_dist);
 
-                    const types = filtered_dat[max_dist_idx]['types'].split(",");
-                    const name = types[Math.floor(Math.random() * types.length)];
-                    relevant_types.push(name);
+                    const types = filtered_dat[max_dist_idx]['types'].split(",").map(t => t.trim());
+                    
+                    // Instead of random selection, pick the LEAST common type
+                    // This will give us more distinctive labels
+                    let selected_type = types[0]; // fallback
+                    let min_frequency = Infinity;
+                    
+                    for (const type of types) {
+                        const freq = type_frequency.get(type) || 0;
+                        if (freq < min_frequency && freq > 0) {
+                            min_frequency = freq;
+                            selected_type = type;
+                        }
+                    }
+                    
+                    relevant_types.push(selected_type);
+                    sys_count++;
+                    
                 }
             }
         }
+        
+        const selected_frequencies = relevant_types.map(t => type_frequency.get(t) || 0);
+        
         return relevant_types;
     }
 
+    // Also add this to see how many cells end up being labeled:
+    let filtered_cells_count = $derived(diamond_dat.filter(d => filter_labs(d, relevant_types)).length);
+    
     function rin(arr1, arr2) {
         return Array.from(arr1, (x) => arr2.indexOf(x) !== -1);
     }
-
+    
     // Wrangling data
     let relevant_types = $derived(get_relevant_types(diamond_dat));
     let ncells = $derived(d3.max(diamond_dat, d => d.x1));
     let max_rank = $derived(d3.max(diamond_dat, (d) => d.rank_L[1]));
     let rounded_max_rank = $derived(10**Math.ceil(Math.log10(max_rank)));
     let xyDomain = $derived([1, rounded_max_rank]);
-
+    
     // Scales (matching D3 version dimensions)
     let xy = $derived(d3.scaleBand().domain(diamond_dat.map(d => d.y1)).range([0, diamondHeight]));
     let logScale = $derived(d3.scaleLog().domain(xyDomain).range([0, innerHeight]).nice());
     let linScale = $derived(d3.scaleLinear().domain([0, ncells-1]).range([0, innerHeight]));
     let wxy = $derived(d3.scaleBand().domain(d3.range(ncells)).range([0, innerHeight]));
-
+    
     let color_scale = d3.scaleSequentialLog().domain([rounded_max_rank, 1]).interpolator(d3.interpolateInferno);
-
+    
     // Background triangles
     let blue_triangle = $derived([[innerHeight, innerHeight], [0, 0], [0, innerHeight]].join(" "));
     let grey_triangle = $derived([[innerHeight, innerHeight], [0, 0], [innerHeight, 0]].join(" "));
-
+    
     function filter_labs(d, relevant_types) {
         return rin(relevant_types, d.types.split(",")).some((x) => x === true);
     }
-
+    
     // TOOLTIP
-
+    
     let tooltipVisible = $state(false);
     let tooltipContent = $state('');
     let tooltipX = $state(0);
     let tooltipY = $state(0);
-
+    
     function showTooltip(event, d) {
         if (d.value === 0) return;
-
+        
         const tokens = d.types.split(",");
         const displayTokens = tokens.length < 50 ?
-            tokens.slice(0, 8).join(", ") :
-            tokens.slice(0, 8).join(", ") + " ...";
-
+        tokens.slice(0, 8).join(", ") :
+        tokens.slice(0, 8).join(", ") + " ...";
+        
         tooltipContent = `
         <div style="color: rgb(89, 89, 89); font-size: 11px;">Types: ${displayTokens}</div>
         `;
-
+        
         tooltipX = event.clientX + 15;
         tooltipY = event.clientY - 10;
         tooltipVisible = true;
     }
-
+    
     function updateTooltipPosition(event) {
         if (tooltipVisible) {
             tooltipX = event.clientX + 15;
             tooltipY = event.clientY - 10;
         }
     }
-
+    
     function hideTooltip() {
         tooltipVisible = false;
     }
+    $inspect(filtered_cells_count, `cells with labels for alpha ${alpha}`);
+    $inspect(relevant_types.length, `relevant_types count for alpha ${alpha}`);
 </script>
 
 <div style="position: relative;">
