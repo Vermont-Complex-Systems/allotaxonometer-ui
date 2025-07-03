@@ -38,6 +38,13 @@ export const alphas = d3.range(0,18).map(v => +(v/12).toFixed(2)).concat([1, 2, 
 // MAIN ALLOTAXONOGRAPH CLASS - SINGLE SOURCE OF TRUTH
 // =============================================================================
 
+function timedCombElems(sys1, sys2) {
+        console.time('combElems');
+        const result = combElems(sys1, sys2);
+        console.timeEnd('combElems');
+        return result;
+    }
+
 export class Allotaxonograph {
     // Core data state
     sys1 = $state<AcceptedData[] | null>(boys1895);
@@ -58,7 +65,7 @@ export class Allotaxonograph {
     WordshiftWidth = $derived(uiState.sidebarCollapsed ? 550 : 400);
 
     // Core data pipeline
-    me = $derived(this.sys1 && this.sys2 ? combElems(this.sys1, this.sys2) : null);
+    me = $derived(this.sys1 && this.sys2 ? timedCombElems(this.sys1, this.sys2) : null);
     rtd = $derived(this.me ? rank_turbulence_divergence(this.me, this.alpha) : null);
     dat = $derived(this.me && this.rtd ? diamond_count(this.me, this.rtd) : null);
     

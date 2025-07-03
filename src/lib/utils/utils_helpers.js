@@ -29,38 +29,62 @@ function which(x) {
 }
 
 
-function matlab_sort(A, rev) {
-  // Inspired by matlab, this functions keep track of the original indices of an array after sorting.
-  // Returns both the sorted vector `v` and the original indices.
-  //
-  // examples 
-  // A = [5, 4, 1, 2, 3]
-  // ([1, 2, 3, 3, 4, 5], [3, 4, 5, 6, 2, 1])
-  
-  let sorted = rev ? A.slice().sort((a, b) => b - a) : A.slice().sort((a, b) => a - b)
-
-  const A_cp = A.slice()
-  const orig_idx = []
-  for (let i = 0; i < A.length; ++i) {
-    orig_idx.push(A_cp.indexOf(sorted[i]))
-    delete A_cp[A_cp.indexOf(sorted[i])]
-  }
-  
-  return {'value': sorted, 'orig_idx': orig_idx}
+function matlab_sort(A, rev = false) {
+    if (A.length === 0) return { value: [], orig_idx: [] };
+    if (A.length === 1) return { value: [...A], orig_idx: [0] };
+    
+    // Create array of [value, originalIndex] pairs
+    const indexedArray = A.map((value, index) => ({ value, index }));
+    
+    // Sort by value (ascending or descending)
+    if (rev) {
+        indexedArray.sort((a, b) => b.value - a.value);
+    } else {
+        indexedArray.sort((a, b) => a.value - b.value);
+    }
+    
+    // Extract sorted values and original indices
+    const value = indexedArray.map(item => item.value);
+    const orig_idx = indexedArray.map(item => item.index);
+    
+    return { value, orig_idx };
 }
 
 function tiedrank(arr) {
-  // tiedrank(X) computes the ranks of the values in the vector X. If any X values are tied, tiedrank computes their average rank. Same as in matlab.
-  function getIndex(arr, val) {
-    var indexes = [], i;
-    for(i = 0; i < arr.length; i++)
-        if (arr[i] === val)
-           indexes.push(i+1);
-    return indexes.reduce((a, b) => a + b) / indexes.length;
-  }
-  
-  const sorted = arr.slice().sort((a, b) => b - a)
-  return arr.map(e => getIndex(sorted, e))
+    if (arr.length === 0) return [];
+    
+    // Group values by their actual value
+    const valueMap = new Map();
+    arr.forEach((value, index) => {
+        if (!valueMap.has(value)) {
+            valueMap.set(value, []);
+        }
+        valueMap.get(value).push(index);
+    });
+    
+    // Sort values in descending order (to match original behavior)
+    const sortedValues = [...valueMap.keys()].sort((a, b) => b - a);
+    
+    // Calculate ranks
+    const ranks = new Array(arr.length);
+    let currentRank = 1;
+    
+    for (const value of sortedValues) {
+        const indices = valueMap.get(value);
+        const tieCount = indices.length;
+        
+        // Calculate average rank for tied values
+        const avgRank = currentRank + (tieCount - 1) / 2;
+        
+        // Assign the average rank to all tied indices
+        indices.forEach(index => {
+            ranks[index] = avgRank;
+        });
+        
+        currentRank += tieCount;
+    }
+    
+    return ranks;
 }
 
 function rank_maxlog10(mixedelements) {

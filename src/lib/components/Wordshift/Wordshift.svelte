@@ -13,7 +13,6 @@
         marginLeft = 70,
         width = 360,
         height,
-        xFormat = '%',
         xLabel = '← System 1 · Divergence contribution · System 2 →',
         yPadding = 0,
         colors = [alloColors.css.lightgrey, alloColors.css.paleblue],
@@ -50,7 +49,7 @@
     // Scales
     let xScale = $derived(d3.scaleLinear(computedXDomain, xRange));
     let yScale = $derived(d3.scaleBand().domain(yDomain).range(yRange).padding(yPadding));
-    let format = $derived(xScale.tickFormat(100, xFormat));
+    let format = $derived(d3.format(".2%"));
     let xTicks = $derived(xScale.ticks(width / 80));
 
     // Helper function matching D3 logic exactly
@@ -107,7 +106,7 @@
                     x={xScale(tick)}
                     y="-12"
                     text-anchor="middle"
-                    style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.verydarkgrey};"
+                    style="font-family: {alloFonts.family}; font-size: 12px; fill: {alloColors.css.verydarkgrey};"
                 >{format(tick)}</text>
             {/each}
 

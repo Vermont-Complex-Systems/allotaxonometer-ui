@@ -25,6 +25,17 @@
     let innerHeight = $derived(DiamondHeight - marginInner);
     let diamondHeight = $derived(innerHeight - marginDiamond);
 
+    // Move rin function here before it's used
+    function rin(arr1, arr2) {
+        return Array.from(arr1, (x) => arr2.indexOf(x) !== -1);
+    }
+
+    // Move filter_labs function here and make it work without relevant_types parameter
+    function filter_labs(d, relevant_types_array) {
+        if (!relevant_types_array || relevant_types_array.length === 0) return false;
+        return rin(relevant_types_array, d.types.split(",")).some((x) => x === true);
+    }
+
     function get_relevant_types(diamond_dat) {
         const ncells = d3.max(diamond_dat, d => d.x1);
         const cumbin = d3.range(0, ncells, 1.5);
@@ -68,25 +79,22 @@
                     
                     relevant_types.push(selected_type);
                     sys_count++;
-                    
                 }
             }
         }
         
-        const selected_frequencies = relevant_types.map(t => type_frequency.get(t) || 0);
-        
         return relevant_types;
     }
 
-    // Also add this to see how many cells end up being labeled:
-    let filtered_cells_count = $derived(diamond_dat.filter(d => filter_labs(d, relevant_types)).length);
+    // Now derive relevant_types from diamond_dat
+    let relevant_types = $derived(get_relevant_types(diamond_dat));
     
-    function rin(arr1, arr2) {
-        return Array.from(arr1, (x) => arr2.indexOf(x) !== -1);
-    }
+    // Calculate filtered cells count AFTER relevant_types is defined
+    let filtered_cells_count = $derived(
+        relevant_types ? diamond_dat.filter(d => filter_labs(d, relevant_types)).length : 0
+    );
     
     // Wrangling data
-    let relevant_types = $derived(get_relevant_types(diamond_dat));
     let ncells = $derived(d3.max(diamond_dat, d => d.x1));
     let max_rank = $derived(d3.max(diamond_dat, (d) => d.rank_L[1]));
     let rounded_max_rank = $derived(10**Math.ceil(Math.log10(max_rank)));
@@ -104,12 +112,7 @@
     let blue_triangle = $derived([[innerHeight, innerHeight], [0, 0], [0, innerHeight]].join(" "));
     let grey_triangle = $derived([[innerHeight, innerHeight], [0, 0], [innerHeight, 0]].join(" "));
     
-    function filter_labs(d, relevant_types) {
-        return rin(relevant_types, d.types.split(",")).some((x) => x === true);
-    }
-    
     // TOOLTIP
-    
     let tooltipVisible = $state(false);
     let tooltipContent = $state('');
     let tooltipX = $state(0);
@@ -142,8 +145,9 @@
     function hideTooltip() {
         tooltipVisible = false;
     }
+    
     $inspect(filtered_cells_count, `cells with labels for alpha ${alpha}`);
-    $inspect(relevant_types.length, `relevant_types count for alpha ${alpha}`);
+    $inspect(relevant_types?.length ?? 0, `relevant_types count for alpha ${alpha}`);
 </script>
 
 <div style="position: relative;">
@@ -178,16 +182,16 @@
         <Grid height={innerHeight} {wxy} {ncells} scale={linScale}></Grid>
 
         <!-- Base layer: Heatmap cells with hover -->
-            {#each diamond_dat as d}
-                <rect
-                    class="diamond-cell"
-                    x={xy(d.x1)}
-                    y={xy(d.y1)}
-                    width={xy.bandwidth()}
-                    height={xy.bandwidth()}
-                    fill={d.value === 0 ? "none" : color_scale(d.value)}
-                />
-            {/each}
+        {#each diamond_dat as d}
+            <rect
+                class="diamond-cell"
+                x={xy(d.x1)}
+                y={xy(d.y1)}
+                width={xy.bandwidth()}
+                height={xy.bandwidth()}
+                fill={d.value === 0 ? "none" : color_scale(d.value)}
+            />
+        {/each}
 
         <!-- Overlay layer: Stroke-only rects matching original D3 -->
         {#each diamond_dat as d}
@@ -207,18 +211,20 @@
             />
         {/each}
 
-        <!-- Text labels with aesthetics styling -->
-        {#each diamond_dat.filter(d => filter_labs(d, relevant_types)) as d}
-            <text
-                x={xy(d.x1)}
-                y={Number.isInteger(d.coord_on_diag) ? xy(d.y1) : xy(d.y1)-1}
-                dx={d.x1 - d.y1 <= 0 ? 5 : -5}
-                dy="5"
-                text-anchor={d.x1 - d.y1 <= 0 ? "start" : "end"}
-                transform="scale(1,-1) rotate(-90) rotate(-45, {xy(d.x1)}, {xy(d.y1)}) translate({d.which_sys === "right" ? xy(Math.sqrt(d.cos_dist))*1.5 : -xy(Math.sqrt(d.cos_dist))*1.5}, 0)"
-                style="font-family: {alloFonts.family}; font-size: 12px; fill: {alloColors.css.darkergrey};"
-            >{d.types.split(",")[0]}</text>
-        {/each}
+        <!-- Text labels with aesthetics styling - add null check -->
+        {#if relevant_types}
+            {#each diamond_dat.filter(d => filter_labs(d, relevant_types)) as d}
+                <text
+                    x={xy(d.x1)}
+                    y={Number.isInteger(d.coord_on_diag) ? xy(d.y1) : xy(d.y1)-1}
+                    dx={d.x1 - d.y1 <= 0 ? 5 : -5}
+                    dy="5"
+                    text-anchor={d.x1 - d.y1 <= 0 ? "start" : "end"}
+                    transform="scale(1,-1) rotate(-90) rotate(-45, {xy(d.x1)}, {xy(d.y1)}) translate({d.which_sys === "right" ? xy(Math.sqrt(d.cos_dist))*1.5 : -xy(Math.sqrt(d.cos_dist))*1.5}, 0)"
+                    style="font-family: {alloFonts.family}; font-size: 12px; fill: {alloColors.css.darkergrey};"
+                >{d.types.split(",")[0]}</text>
+            {/each}
+        {/if}
 
         <!-- Middle diagonal line with aesthetics colors -->
         <line
@@ -253,5 +259,4 @@
             {@html tooltipContent}
         </div>
     {/if}
-
 </div>
