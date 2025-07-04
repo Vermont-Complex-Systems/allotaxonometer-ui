@@ -2,12 +2,13 @@
     import { Accordion } from "bits-ui";
     
     let { 
-        alpha = $bindable(0.58),
+        allotax,  // Pass the whole class instance
         alphaIndex = $bindable(7),
         alphas
     } = $props();
 
-
+    // Derived alpha for display
+    let alpha = $derived(allotax.alpha);
 </script>
 
 <Accordion.Item value="alpha" class="accordion-item">
@@ -23,7 +24,10 @@
                     min="0"
                     max={alphas.length - 1}
                     value={alphaIndex}
-                    oninput={(e) => alphaIndex = parseInt(e.target.value)}
+                    oninput={(e) => {
+                        alphaIndex = parseInt(e.target.value);
+                        allotax.setAlpha(alphas[alphaIndex]); // Update the class
+                    }}
                     class="alpha-slider"
                 />
                 
