@@ -17,8 +17,8 @@ function diamond_counts(mixedelements) {
   // Pre-compute all coordinates and group by them
   const coordGroups = new Map();
   for (let i = 0; i < mixedelements[0]['ranks'].length; i++) {
-      const x1 = rank2coord(mixedelements[0]['ranks'][i]);
-      const y1 = rank2coord(mixedelements[1]['ranks'][i]);
+      const x1 = rank2coord(mixedelements[1]['ranks'][i]); // System 1 → X
+      const y1 = rank2coord(mixedelements[0]['ranks'][i]); // System 0 → Y
       const key = `${x1},${y1}`;
       
       if (!coordGroups.has(key)) {
