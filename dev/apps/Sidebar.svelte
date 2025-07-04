@@ -13,6 +13,8 @@
         toggleSidebar,
         handleFileUpload
     } from './state.svelte.ts';
+
+    let alphaIndex = $state(7);
 </script>
 
 <div class="sidebar-content">
@@ -45,8 +47,8 @@
                 />
                 <Separator.Root/>
                 <AlphaControl 
-                    alpha={allotax.alpha} 
-                    bind:alphaIndex={allotax.alphaIndex} 
+                    {allotax}
+                    bind:alphaIndex={alphaIndex}
                     {alphas} 
                 />
                 <Separator.Root/>
