@@ -145,10 +145,9 @@
     function hideTooltip() {
         tooltipVisible = false;
     }
-    
-    $inspect(filtered_cells_count, `cells with labels for alpha ${alpha}`);
-    $inspect(relevant_types?.length ?? 0, `relevant_types count for alpha ${alpha}`);
 </script>
+
+
 
 <div style="position: relative;">
     <svg
@@ -157,8 +156,11 @@
         height={DiamondHeight}
         viewBox="0 0 {DiamondHeight} {DiamondHeight}"
         style="overflow: visible; display: block;"
-        transform="scale(-1,1) rotate(45) translate({innerHeight/4}, {innerHeight/4})"
     >
+        <!-- <g transform="scale(-1,1) rotate(45) translate({innerHeight/4}, {innerHeight/4})"> -->
+        <!-- Using matrix notation because safari... -->
+        <g transform="matrix(-0.7071, 0.7071, 0.7071, 0.7071, {DiamondHeight * 0.5}, {DiamondHeight * 0.067})">
+        
         <!-- Background polygons with correct colors from aesthetics.js -->
         <polygon
             class="diamond-background grey-triangle"
@@ -234,6 +236,7 @@
         />
 
         <Contours {alpha} {maxlog10} {divnorm} DiamondInnerHeight={innerHeight}></Contours>
+        </g>
     </svg>
 
     <!-- Tooltip with inline styles to ensure they work -->

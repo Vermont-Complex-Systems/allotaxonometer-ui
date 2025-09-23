@@ -7,3 +7,6 @@ src/lib/components/Test/
 *Old.js
 src/lib/utils/indexOld.ts
 test-output/
+CLAUDE.md
+.mcp.json
+.gitignore
