@@ -123,7 +123,13 @@ export default function diamond_count(mixedelements, wordshift) {
     }
     
     const counts = diamond_counts(mixedelements);
-  
-  return({'counts': counts, 'deltas': deltas, 'max_delta_loss': Math.max(...deltas_loss)})
+
+  // Find max manually to avoid stack overflow with large arrays
+  let max_delta_loss = deltas_loss[0];
+  for (let i = 1; i < deltas_loss.length; i++) {
+    if (deltas_loss[i] > max_delta_loss) max_delta_loss = deltas_loss[i];
+  }
+
+  return({'counts': counts, 'deltas': deltas, 'max_delta_loss': max_delta_loss})
 }
 

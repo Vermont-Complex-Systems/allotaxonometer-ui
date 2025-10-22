@@ -89,10 +89,20 @@ function tiedrank(arr) {
 
 function rank_maxlog10(mixedelements) {
   // Get maximum of log10 ranks from both systems, then round up
-  let logged_max = [
-    Math.max(...mixedelements[[0]].ranks), Math.max(...mixedelements[[1]].ranks)
-  ].map(Math.log10)
-  return Math.ceil(Math.max(...[logged_max[0], logged_max[1]]))
+  // Use loop to avoid stack overflow with large arrays (Math.max(...array) fails for 100K+ items)
+  let max1 = mixedelements[[0]].ranks[0];
+  for (let i = 1; i < mixedelements[[0]].ranks.length; i++) {
+    if (mixedelements[[0]].ranks[i] > max1) max1 = mixedelements[[0]].ranks[i];
+  }
+
+  let max2 = mixedelements[[1]].ranks[0];
+  for (let i = 1; i < mixedelements[[1]].ranks.length; i++) {
+    if (mixedelements[[1]].ranks[i] > max2) max2 = mixedelements[[1]].ranks[i];
+  }
+
+  const logged_max1 = Math.log10(max1);
+  const logged_max2 = Math.log10(max2);
+  return Math.ceil(Math.max(logged_max1, logged_max2))
 }
 
 function rin(arr1, arr2) {
