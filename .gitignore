@@ -10,3 +10,5 @@ test-output/
 CLAUDE.md
 .mcp.json
 .gitignore
+rust-wasm/target/
+WASM_IMPLEMENTATION.md

@@ -53,9 +53,10 @@
     "vitest": "^3.2.3"
   },
   "scripts": {
-    "build": "vite build",
+    "build:wasm": "cd rust-wasm && wasm-pack build --target web --out-dir ../src/lib/utils/wasm",
+    "build": "npm run build:wasm && vite build",
     "build:ssr": "vite build --config vite.ssr.config.js",
-    "build:all": "npm run build && npm run build:ssr",
+    "build:all": "npm run build:wasm && npm run build && npm run build:ssr",
     "test": "vitest",
     "test:run": "vitest run",
     "test:ssr": "npm run build:ssr && vitest run tests/ssr.test.js",
