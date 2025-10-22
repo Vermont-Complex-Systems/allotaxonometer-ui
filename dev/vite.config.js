@@ -20,5 +20,13 @@ export default defineConfig({
       'allotaxonometer-ui': path.resolve(__dirname, '../src/lib'),
       '$lib': path.resolve(__dirname, './src/lib')
     }
-  }
+  },
+  server: {
+    fs: {
+      // Allow serving files from parent directory (for WASM files)
+      allow: ['..']
+    }
+  },
+  // Ensure WASM files are treated as assets
+  assetsInclude: ['**/*.wasm']
 });
