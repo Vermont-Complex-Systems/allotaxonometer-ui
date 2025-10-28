@@ -98,7 +98,26 @@ export default function rank_turbulence_divergence(mixedelements, alpha) {
         mixedelements[1]['counts'],
         alpha
       );
-      return result;
+
+      // WASM returns a Map, convert to plain object to match expected interface
+      if (result instanceof Map) {
+        return {
+          divergence_elements: result.get('divergence_elements'),
+          normalization: result.get('normalization')
+        };
+      }
+
+      // Handle plain object (in case WASM serialization changes in the future)
+      if (result && typeof result === 'object' && result.divergence_elements) {
+        return {
+          divergence_elements: result.divergence_elements,
+          normalization: result.normalization
+        };
+      }
+
+      // Unexpected format, fall back to JS
+      console.warn('⚠️  WASM returned unexpected format, using JS fallback. Got:', result);
+      return rank_turbulence_divergence_js(mixedelements, alpha);
     } catch (e) {
       console.warn('⚠️  WASM execution failed, using JS fallback:', e);
       return rank_turbulence_divergence_js(mixedelements, alpha);
