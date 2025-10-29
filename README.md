@@ -24,10 +24,20 @@ npm install allotaxonometer-ui
 - Explore systems and formulate research questions: we recommend starting with the web app...
 - Running multiple or larger scale analyses: we recommend using the py-allotax, which details its install instructions, details the required data format, and provides examples in its repo.
 
-## CSV input
+## Data Input
 
-The allotaxonometer expects 2 tables in the following form:
+The allotaxonometer expects 2 datasets with `types` and `counts`. The `totalunique` and `probs` fields are **optional** and will be calculated automatically if not provided.
 
+### Minimal Format (Recommended)
+```javascript
+const data = [{
+  types: ['John', 'William', 'James', 'George', 'Charles'],
+  counts: [8502, 7494, 5097, 4458, 4061]
+  // totalunique and probs calculated automatically!
+}];
+```
+
+### Full Format (All Fields)
 |    | types   |   counts |   totalunique |   probs |
 |----|---------|----------|---------------|---------|
 |  0 | John    |     8502 |          1161 |  0.0766 |

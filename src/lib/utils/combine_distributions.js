@@ -1,14 +1,39 @@
 import { tiedrank, getUnions, setdiff } from "./utils_helpers.js";
 import { descending } from "d3-array";
 
+// Normalize a dataset: calculate totalunique and probs if missing
+function normalizeDataset(data) {
+    // If data already has all required fields, return as-is
+    if (data.every(item => item.probs !== undefined && item.totalunique !== undefined)) {
+        return data;
+    }
+
+    // Calculate total count for probability calculation
+    const totalCount = data.reduce((sum, item) => sum + item.counts, 0);
+    const totalunique = data.length;
+
+    // Return normalized data with calculated fields
+    return data.map(item => ({
+        types: item.types,
+        counts: item.counts,
+        totalunique: item.totalunique ?? totalunique,
+        probs: item.probs ?? (item.counts / totalCount)
+    }));
+}
+
 // Optimized combElems - Single-pass approach (Opt2)
 // This version shows 20-50% performance improvements in most scenarios
+// Now supports optional totalunique and probs fields
 function combElems(elem1, elem2) {
+    // Normalize datasets: calculate totalunique and probs if missing
+    const normalized1 = normalizeDataset(elem1);
+    const normalized2 = normalizeDataset(elem2);
+
     // Build union and collect data in single pass
     const typeMap = new Map();
-    
+
     // Process first dataset
-    for (const item of elem1) {
+    for (const item of normalized1) {
         typeMap.set(item.types, {
             counts1: item.counts,
             probs1: item.probs,
@@ -16,9 +41,9 @@ function combElems(elem1, elem2) {
             probs2: 0
         });
     }
-    
+
     // Process second dataset, updating existing or adding new
-    for (const item of elem2) {
+    for (const item of normalized2) {
         const existing = typeMap.get(item.types);
         if (existing) {
             existing.counts2 = item.counts;

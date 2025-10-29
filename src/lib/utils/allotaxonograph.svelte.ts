@@ -5,8 +5,8 @@ import { combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, ba
 export type AcceptedData = {
     types: string[];
     counts: number[];
-    totalunique: number;
-    probs: number[];
+    totalunique?: number;  // Optional: will be calculated if missing
+    probs?: number[];      // Optional: will be calculated if missing
 };
 
 export type AllotaxonographOptions = {
