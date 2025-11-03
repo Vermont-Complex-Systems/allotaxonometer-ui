@@ -16,20 +16,19 @@
         xLabel = '← System 1 · Divergence contribution · System 2 →',
         yPadding = 0,
         colors = [alloColors.css.lightgrey, alloColors.css.paleblue],
-        barHeightFactor = 0.7
+        barHeightFactor = 0.7,
+        onBarClick = undefined,  // (event, data, label) => void
+        selectedBar = null  // Track selected bar (pass label)
     } = $props();
 
-    // Compute values (matching D3 version exactly)
     let X = $derived(d3.map(barData, x));
     let Y = $derived(d3.map(barData, y));
 
-    // Compute domains
     let computedXDomain = $derived(xDomain || d3.extent(X));
     let yDomain = $derived(new d3.InternSet(Y));
 
-    // Match D3 dimensions exactly
-    const xAxisYOffset = 10; // Space below x-axis (from original)
-    const bandHeight = 18;   // Fixed band height (from original)
+    const xAxisYOffset = 10; // Space below x-axis
+    const bandHeight = 18;   // Fixed band height
     const shiftSvgBy = 12;   // shift svg up to align with system titles
     const barYOffset = 10;   // Additional offset just for bars
 
@@ -79,12 +78,9 @@
     viewBox="0 0 {width} {finalHeight}"
     style="overflow: visible; display: block;"
 >
-    <!-- Main wrapper transform matching D3 exactly -->
     <g class='wordshift-container' transform="translate({marginLeft}, {marginTop - shiftSvgBy})">
-        <!-- X-axis with ticks and grid lines -->
         <g class='wordshift-axis x' transform="translate(0, {xAxisYOffset})">
             {#each xTicks as tick}
-                <!-- Original tick marks (short) -->
                 <line
                     x1={xScale(tick)}
                     y1="0"
@@ -92,7 +88,6 @@
                     y2="6"
                     style="stroke: currentColor; stroke-width: 1;"
                 />
-                <!-- Extended grid lines (cloned effect) -->
                 <line
                     class="wordshift-grid-line"
                     x1={xScale(tick)}
@@ -121,14 +116,24 @@
 
         <!-- Bars -->
         {#each I as i}
+            {@const isSelected = selectedBar === Y[i]}
             <rect
                 class="wordshift-bar"
+                class:selected={isSelected}
                 x={Math.min(xScale(0), xScale(X[i]))}
                 y={yScale(Y[i]) + (yScale.bandwidth() - yScale.bandwidth() * barHeightFactor) / 2}
                 fill={colors[X[i] > 0 ? colors.length - 1 : 0]}
                 width={Math.abs(xScale(X[i]) - xScale(0))}
                 height={yScale.bandwidth() * barHeightFactor}
-                style="mix-blend-mode: multiply;"
+                style="
+                    mix-blend-mode: multiply;
+                    cursor: {onBarClick ? 'pointer' : 'default'};
+                    opacity: {isSelected ? 1 : (selectedBar ? 0.3 : 1)};
+                    transition: opacity 0.2s ease, stroke 0.2s ease;
+                "
+                stroke={isSelected ? '#ff6b6b' : 'none'}
+                stroke-width={isSelected ? '2' : '0'}
+                onclick={(e) => onBarClick?.(e, barData[i], Y[i])}
             />
         {/each}
 
@@ -160,3 +165,13 @@
         </g>
     </g>
 </svg>
+
+<style>
+    .wordshift-bar:hover {
+        filter: brightness(0.85);
+    }
+
+    .wordshift-bar.selected {
+        filter: drop-shadow(0 0 4px rgba(255, 107, 107, 0.6));
+    }
+</style>

@@ -14,7 +14,9 @@
         maxlog10,
         DiamondHeight = 600,
         marginInner = 160,
-        marginDiamond = 40
+        marginDiamond = 40,
+        highlightedTerm = null,
+        highlightedSystem = null  // 'left' or 'right'
     } = $props();
 
     // Extract data from dat object
@@ -185,13 +187,19 @@
 
         <!-- Base layer: Heatmap cells with hover -->
         {#each diamond_dat as d}
+            {@const typesList = d.types.split(',').map(t => t.trim())}
+            {@const isHighlighted = highlightedTerm &&
+                                   typesList.includes(highlightedTerm) &&
+                                   (!highlightedSystem || d.which_sys === highlightedSystem)}
             <rect
                 class="diamond-cell"
+                class:highlighted={isHighlighted}
                 x={xy(d.x1)}
                 y={xy(d.y1)}
                 width={xy.bandwidth()}
                 height={xy.bandwidth()}
                 fill={d.value === 0 ? "none" : color_scale(d.value)}
+                style="opacity: {highlightedTerm && !isHighlighted ? 0.3 : 1};"
             />
         {/each}
 
@@ -263,3 +271,11 @@
         </div>
     {/if}
 </div>
+
+<style>
+    .diamond-cell.highlighted {
+        stroke: #ff6b6b;
+        stroke-width: 2;
+        filter: drop-shadow(0 0 4px rgba(255, 107, 107, 0.5));
+    }
+</style>
