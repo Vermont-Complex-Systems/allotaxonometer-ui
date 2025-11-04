@@ -2,11 +2,12 @@
     import { Accordion, Button, Separator } from "bits-ui";
     import UploadSection from './sidebar/UploadSection.svelte';
     import AlphaControl from './sidebar/AlphaControl.svelte';
+    import LabelThresholdControl from './sidebar/LabelThresholdControl.svelte';
     import DataInfo from './sidebar/DataInfo.svelte';
     import StatusCard from './sidebar/StatusCard.svelte';
-    
-    
-    import { 
+
+
+    import {
         allotax,
         uiState,
         alphas,
@@ -35,8 +36,8 @@
     
     {#if !uiState.sidebarCollapsed}
         <div class="sidebar-body">
-            <Accordion.Root type="multiple" value={["upload", "alpha", "info"]} class="accordion">
-                <UploadSection 
+            <Accordion.Root type="multiple" value={["upload", "alpha", "labelThreshold", "info"]} class="accordion">
+                <UploadSection
                         bind:sys1={allotax.sys1}
                         bind:sys2={allotax.sys2}
                         bind:title={allotax.title}
@@ -46,17 +47,21 @@
                         fileMetadata={uiState.fileMetadata}
                 />
                 <Separator.Root/>
-                <AlphaControl 
+                <AlphaControl
                     {allotax}
                     bind:alphaIndex={alphaIndex}
-                    {alphas} 
+                    {alphas}
                 />
                 <Separator.Root/>
-                <DataInfo 
-                    title={allotax.title} 
-                    me={allotax.me} 
-                    rtd={allotax.rtd} 
-                    isDataReady={allotax.isDataReady} 
+                <LabelThresholdControl
+                    bind:labelThreshold={uiState.labelThreshold}
+                />
+                <Separator.Root/>
+                <DataInfo
+                    title={allotax.title}
+                    me={allotax.me}
+                    rtd={allotax.rtd}
+                    isDataReady={allotax.isDataReady}
                 />
             </Accordion.Root>
 

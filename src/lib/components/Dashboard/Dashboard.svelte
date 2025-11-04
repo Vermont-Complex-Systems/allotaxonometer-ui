@@ -28,6 +28,7 @@
     marginDiamond?: number;       // Replaces margin.diamond
     max_count_log?: number;       // For legend
     xDomain?: [number, number]; // Optional x-axis domain for Wordshift
+    labelThreshold?: number;      // Maximum number of types per cell to show labels in Diamond
 
     // Style props
     class?: string;
@@ -63,6 +64,7 @@
     marginInner = 160,
     marginDiamond = 40,
     max_count_log = undefined,
+    labelThreshold = Infinity,
   }: DashboardProps = $props();
 
   let max_shift = $derived(
@@ -94,6 +96,7 @@
             <Diamond
               {dat} {alpha} {divnorm} {title} {maxlog10}
               {DiamondHeight} {marginInner} {marginDiamond}
+              {labelThreshold}
             />
       </div>
 

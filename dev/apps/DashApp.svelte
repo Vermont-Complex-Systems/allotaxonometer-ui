@@ -12,9 +12,9 @@
                 <Sidebar />
             </aside>
             
-            <main class="main-content {uiState.sidebarCollapsed ? 'collapsed-sidebar' : ''}">     
+            <main class="main-content {uiState.sidebarCollapsed ? 'collapsed-sidebar' : ''}">
                 {#if allotax.isDataReady}
-                    <Dashboard {...allotax} />
+                    <Dashboard {...allotax} labelThreshold={uiState.labelThreshold} />
                 {:else}
                     <div class="loading-container">
                         <div class="loading-content">

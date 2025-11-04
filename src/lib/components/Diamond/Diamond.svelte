@@ -16,7 +16,8 @@
         marginInner = 160,
         marginDiamond = 40,
         highlightedTerm = null,
-        highlightedSystem = null  // 'left' or 'right'
+        highlightedSystem = null,  // 'left' or 'right'
+        labelThreshold = Infinity  // Maximum number of types per cell to show labels (default: show all)
     } = $props();
 
     // Extract data from dat object
@@ -35,6 +36,11 @@
     // Move filter_labs function here and make it work without relevant_types parameter
     function filter_labs(d, relevant_types_array) {
         if (!relevant_types_array || relevant_types_array.length === 0) return false;
+
+        // Check if the cell has too many types (exceeds threshold)
+        const typeCount = d.types.split(",").length;
+        if (typeCount > labelThreshold) return false;
+
         return rin(relevant_types_array, d.types.split(",")).some((x) => x === true);
     }
 

@@ -17,7 +17,8 @@ export const uiState = $state({
     fileMetadata: {
         sys1: null,
         sys2: null
-    }
+    },
+    labelThreshold: Infinity  // Default: show all labels
 });
 
 // =============================================================================
