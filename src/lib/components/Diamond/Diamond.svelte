@@ -191,6 +191,7 @@
             {@const isHighlighted = highlightedTerm &&
                                    typesList.includes(highlightedTerm) &&
                                    (!highlightedSystem || d.which_sys === highlightedSystem)}
+            
             <rect
                 class="diamond-cell"
                 class:highlighted={isHighlighted}
@@ -199,8 +200,11 @@
                 width={xy.bandwidth()}
                 height={xy.bandwidth()}
                 fill={d.value === 0 ? "none" : color_scale(d.value)}
+                stroke={isHighlighted ? "#ff6b6b" : "none"}
+                stroke-width={isHighlighted ? 2 : 0}
                 style="opacity: {highlightedTerm && !isHighlighted ? 0.3 : 1};"
             />
+
         {/each}
 
         <!-- Overlay layer: Stroke-only rects matching original D3 -->
@@ -218,6 +222,8 @@
                 onmouseenter={(e) => showTooltip(e, d)}
                 onmouseleave={hideTooltip}
                 onmousemove={updateTooltipPosition}
+                role="button"
+                tabindex="0"
             />
         {/each}
 
@@ -271,11 +277,3 @@
         </div>
     {/if}
 </div>
-
-<style>
-    .diamond-cell.highlighted {
-        stroke: #ff6b6b;
-        stroke-width: 2;
-        filter: drop-shadow(0 0 4px rgba(255, 107, 107, 0.5));
-    }
-</style>
