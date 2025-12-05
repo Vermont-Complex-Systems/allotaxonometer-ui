@@ -117,24 +117,56 @@
         <!-- Bars -->
         {#each I as i}
             {@const isSelected = selectedBar === Y[i]}
-            <rect
-                class="wordshift-bar"
-                class:selected={isSelected}
-                x={Math.min(xScale(0), xScale(X[i]))}
-                y={yScale(Y[i]) + (yScale.bandwidth() - yScale.bandwidth() * barHeightFactor) / 2}
-                fill={colors[X[i] > 0 ? colors.length - 1 : 0]}
-                width={Math.abs(xScale(X[i]) - xScale(0))}
-                height={yScale.bandwidth() * barHeightFactor}
-                style="
-                    mix-blend-mode: multiply;
-                    cursor: {onBarClick ? 'pointer' : 'default'};
-                    opacity: {isSelected ? 1 : (selectedBar ? 0.3 : 1)};
-                    transition: opacity 0.2s ease, stroke 0.2s ease;
-                "
-                stroke={isSelected ? '#ff6b6b' : 'none'}
-                stroke-width={isSelected ? '2' : '0'}
-                onclick={(e) => onBarClick?.(e, barData[i], Y[i])}
-            />
+            {#if onBarClick}
+                <g
+                    class="wordshift-bar-group"
+                    role="button"
+                    tabindex="0"
+                    aria-label={`${Y[i]}, value: ${format(X[i])}`}
+                    onclick={(e) => onBarClick(e, barData[i], Y[i])}
+                    onkeydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onBarClick(e, barData[i], Y[i]);
+                        }
+                    }}
+                >
+                    <rect
+                        class="wordshift-bar"
+                        class:selected={isSelected}
+                        x={Math.min(xScale(0), xScale(X[i]))}
+                        y={yScale(Y[i]) + (yScale.bandwidth() - yScale.bandwidth() * barHeightFactor) / 2}
+                        fill={colors[X[i] > 0 ? colors.length - 1 : 0]}
+                        width={Math.abs(xScale(X[i]) - xScale(0))}
+                        height={yScale.bandwidth() * barHeightFactor}
+                        style="
+                            mix-blend-mode: multiply;
+                            cursor: pointer;
+                            opacity: {isSelected ? 1 : (selectedBar ? 0.3 : 1)};
+                            transition: opacity 0.2s ease, stroke 0.2s ease;
+                        "
+                        stroke={isSelected ? '#ff6b6b' : 'none'}
+                        stroke-width={isSelected ? '2' : '0'}
+                    />
+                </g>
+            {:else}
+                <rect
+                    class="wordshift-bar"
+                    class:selected={isSelected}
+                    x={Math.min(xScale(0), xScale(X[i]))}
+                    y={yScale(Y[i]) + (yScale.bandwidth() - yScale.bandwidth() * barHeightFactor) / 2}
+                    fill={colors[X[i] > 0 ? colors.length - 1 : 0]}
+                    width={Math.abs(xScale(X[i]) - xScale(0))}
+                    height={yScale.bandwidth() * barHeightFactor}
+                    style="
+                        mix-blend-mode: multiply;
+                        opacity: {isSelected ? 1 : (selectedBar ? 0.3 : 1)};
+                        transition: opacity 0.2s ease, stroke 0.2s ease;
+                    "
+                    stroke={isSelected ? '#ff6b6b' : 'none'}
+                    stroke-width={isSelected ? '2' : '0'}
+                />
+            {/if}
         {/each}
 
         <!-- Y-axis labels with names and numbers -->
@@ -148,7 +180,7 @@
                         x={xValue > 0 ? 6 : -6}
                         dy="0.32em"
                         text-anchor={xValue > 0 ? "start" : "end"}
-                        style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.verydarkgrey};"
+                        style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.verydarkgrey}; pointer-events: none;"
                     >{labelData.name_y}</text>
 
                     <!-- Numbers text on the opposite side (matching D3 positioning) -->
@@ -157,7 +189,7 @@
                             x={xValue > 0 ? -6 : 6}
                             dy="0.32em"
                             text-anchor={xValue > 0 ? "end" : "start"}
-                            style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.darkergrey}; opacity: 0.5;"
+                            style="font-family: {alloFonts.family}; font-size: 14px; fill: {alloColors.css.darkergrey}; opacity: 0.5; pointer-events: none;"
                         >{labelData.numbers_y}</text>
                     {/if}
                 </g>
@@ -167,8 +199,19 @@
 </svg>
 
 <style>
-    .wordshift-bar:hover {
+    .wordshift-bar-group {
+        outline: none;
+        cursor: pointer;
+    }
+
+    .wordshift-bar-group:hover .wordshift-bar {
         filter: brightness(0.85);
+    }
+
+    .wordshift-bar-group:focus .wordshift-bar {
+        filter: brightness(0.85);
+        outline: 2px solid #4a90e2;
+        outline-offset: 2px;
     }
 
     .wordshift-bar.selected {

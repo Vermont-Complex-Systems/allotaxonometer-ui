@@ -114,7 +114,7 @@
     let linScale = $derived(d3.scaleLinear().domain([0, ncells-1]).range([0, innerHeight]));
     let wxy = $derived(d3.scaleBand().domain(d3.range(ncells)).range([0, innerHeight]));
     
-    let color_scale = d3.scaleSequentialLog().domain([rounded_max_rank, 1]).interpolator(d3.interpolateInferno);
+    let color_scale = $derived(d3.scaleSequentialLog().domain([rounded_max_rank, 1]).interpolator(d3.interpolateInferno));
     
     // Background triangles
     let blue_triangle = $derived([[innerHeight, innerHeight], [0, 0], [0, innerHeight]].join(" "));
