@@ -134,9 +134,9 @@ describe('WASM Map return type bug - Allotaxonograph integration', () => {
     expect(() => instance.dat).not.toThrow();
     const initialNorm = instance.rtd.normalization;
 
-    // Update data with different distributions
-    const elem3 = [generateMockData(40, 3)];
-    const elem4 = [generateMockData(40, 4)];
+    // Update data with significantly different distributions (different size + large seed shift)
+    const elem3 = [generateMockData(20, 100)];
+    const elem4 = [generateMockData(20, 500)];
     instance.updateData(elem3, elem4, ['Updated 1', 'Updated 2']);
 
     // Should recompute without errors

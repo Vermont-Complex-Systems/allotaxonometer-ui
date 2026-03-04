@@ -12,6 +12,7 @@
         divnorm,
         title,
         maxlog10,
+        ncells: ncellsOverride = undefined,  // Optional: override grid cell count
         DiamondHeight = 600,
         marginInner = 160,
         marginDiamond = 40,
@@ -22,7 +23,6 @@
 
     // Extract data from dat object
     let diamond_dat = $derived(dat.counts);
-    let deltas = $derived(dat.deltas);
 
     // Calculate derived dimensions (matching D3 version exactly)
     let innerHeight = $derived(DiamondHeight - marginInner);
@@ -103,13 +103,15 @@
     );
     
     // Wrangling data
-    let ncells = $derived(d3.max(diamond_dat, d => d.x1));
-    let max_rank = $derived(d3.max(diamond_dat, (d) => d.rank_L[1]));
+    // Compute ncells from maxlog10 (matches Rust: floor(maxlog10 / (1/15)) + 1)
+    // This is correct even with sparse data (no empty cells) since maxlog10 is the full grid extent.
+    let ncells = $derived(ncellsOverride ?? Math.floor(maxlog10 * 15) + 1);
+    let max_rank = $derived(d3.max(diamond_dat, (d) => d.rank_L?.[1] ?? d.max_rank ?? 0));
     let rounded_max_rank = $derived(10**Math.ceil(Math.log10(max_rank)));
     let xyDomain = $derived([1, rounded_max_rank]);
-    
+
     // Scales (matching D3 version dimensions)
-    let xy = $derived(d3.scaleBand().domain(diamond_dat.map(d => d.y1)).range([0, diamondHeight]));
+    let xy = $derived(d3.scaleBand().domain(d3.range(ncells)).range([0, diamondHeight]));
     let logScale = $derived(d3.scaleLog().domain(xyDomain).range([0, innerHeight]).nice());
     let linScale = $derived(d3.scaleLinear().domain([0, ncells-1]).range([0, innerHeight]));
     let wxy = $derived(d3.scaleBand().domain(d3.range(ncells)).range([0, innerHeight]));
