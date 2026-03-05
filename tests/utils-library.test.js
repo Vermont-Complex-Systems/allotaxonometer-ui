@@ -207,6 +207,27 @@ describe('Utils Library Functions Integration', () => {
       expect(maxlog10).toBeGreaterThan(0);
       expect(Number.isInteger(maxlog10)).toBe(true);
     });
+
+    test('delta_sum vs normalization — are they the same?', () => {
+      const alpha = 0.58;
+      const me = combElems(testData1, testData2);
+      const rtd = rank_turbulence_divergence(me, alpha);
+      const dat = diamond_count(me, rtd);
+
+      // delta_sum: what the math formula displays
+      const delta_sum = dat.deltas.reduce((a, b) => a + b, 0);
+      // normalization: what the API returns
+      const normalization = rtd.normalization;
+
+      console.log(`delta_sum     = ${delta_sum.toFixed(6)}`);
+      console.log(`normalization = ${normalization.toFixed(6)}`);
+      console.log(`Are they equal? ${Math.abs(delta_sum - normalization) < 1e-6}`);
+      console.log(`Ratio delta_sum/normalization = ${(delta_sum / normalization).toFixed(6)}`);
+
+      // Document the actual relationship
+      expect(delta_sum).toBeGreaterThan(0);
+      expect(normalization).toBeGreaterThan(0);
+    });
   });
 
   test('generates utils performance report', () => {
