@@ -1,6 +1,6 @@
 {
   "name": "allotaxonometer-ui",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "description": "Headless UI components for allotaxonometer visualizations built with Svelte 5",
   "type": "module",
   "main": "./dist/index.js",
@@ -53,7 +53,7 @@
     "vitest": "^3.2.3"
   },
   "scripts": {
-    "build:wasm": "cd rust-wasm && wasm-pack build --target web --out-dir ../src/lib/utils/wasm",
+    "build:wasm": "cd ../allotaxonometer-core/crates/allotax-wasm && wasm-pack build --target web --out-dir ../../../allotaxonometer-ui/src/lib/utils/wasm",
     "build": "npm run build:wasm && vite build",
     "build:ssr": "vite build --config vite.ssr.config.js",
     "build:all": "npm run build:wasm && npm run build && npm run build:ssr",

@@ -21,10 +21,32 @@ function normalizeDataset(data) {
     }));
 }
 
+// Convert array-per-field format [{types: ['a','b'], counts: [100,50]}]
+// to row format [{types: 'a', counts: 100}, {types: 'b', counts: 50}]
+function toRowFormat(data) {
+    if (data.length > 0 && Array.isArray(data[0].types)) {
+        return data.flatMap(d =>
+            d.types.map((type, i) => ({
+                types: type,
+                counts: d.counts[i],
+                ...(d.probs ? { probs: d.probs[i] } : {}),
+                ...(d.totalunique !== undefined ? { totalunique: d.totalunique } : {})
+            }))
+        );
+    }
+    return data;
+}
+
 // Optimized combElems - Single-pass approach (Opt2)
 // This version shows 20-50% performance improvements in most scenarios
 // Now supports optional totalunique and probs fields
+// Accepts both row format [{types: 'a', counts: 100}, ...] and
+// array-per-field format [{types: ['a','b'], counts: [100,50]}]
 function combElems(elem1, elem2) {
+    // Handle array-per-field format
+    elem1 = toRowFormat(elem1);
+    elem2 = toRowFormat(elem2);
+
     // Normalize datasets: calculate totalunique and probs if missing
     const normalized1 = normalizeDataset(elem1);
     const normalized2 = normalizeDataset(elem2);
@@ -97,6 +119,8 @@ function combElems(elem1, elem2) {
 
 // helpers to wrangle data for the balance plot
 function balanceDat(elem1, elem2) {
+  elem1 = toRowFormat(elem1);
+  elem2 = toRowFormat(elem2);
   const types_1 = elem1.map(d => d.types)
   const types_2 = elem2.map(d => d.types)
 
