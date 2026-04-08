@@ -59,7 +59,7 @@
                 <Separator.Root/>
                 <DataInfo
                     title={allotax.title}
-                    me={allotax.me}
+                    itemCount={allotax.rtd?.divergence_elements?.length ?? 0}
                     rtd={allotax.rtd}
                     isDataReady={allotax.isDataReady}
                 />

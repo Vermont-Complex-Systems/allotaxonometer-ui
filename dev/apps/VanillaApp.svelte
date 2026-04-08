@@ -1,27 +1,22 @@
 <script>
-    import * as d3 from "d3";
-    import { Diamond, Wordshift } from 'allotaxonometer-ui';
-    import { combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, balanceDat } from 'allotaxonometer-ui';
+    import { Diamond, Wordshift, Allotaxonograph } from 'allotaxonometer-ui';
     import boys1895 from '../../tests/fixtures/boys-1895.json';
     import boys1968 from '../../tests/fixtures/boys-1968.json';
 
-    // Process the data directly
-    let sys1 = boys1895;
-    let sys2 = boys1968;
     let alpha = $state(0.58);
     let title = $derived(['Boys 1895', 'Boys 1968']);
 
     let DiamondHeight = 600;
 
-  // Updated data processing with new API
-  let me = $derived(sys1 && sys2 ? combElems(sys1, sys2) : null);
-  let rtd = $derived(me ? rank_turbulence_divergence(me, alpha) : null);
-  let dat = $derived(me && rtd ? diamond_count(me, rtd) : null);
+  // Single reactive state container — runs the full pipeline (WASM if available, JS fallback otherwise).
+  const allotax = new Allotaxonograph(boys1895, boys1968, { alpha, topN: 30 });
+  $effect(() => { allotax.alpha = alpha; });
 
-  // Updated derived values
-  let barData = $derived(me && dat ? wordShift_dat(me, dat).slice(0, 30) : []);
-  let maxlog10 = $derived(me ? Math.ceil(d3.max([Math.log10(d3.max(me[0].ranks)), Math.log10(d3.max(me[1].ranks))])) : 0);
-  let max_shift = $derived(barData.length > 0 ? d3.max(barData, d => Math.abs(d.metric)) : 1);
+  let dat = $derived(allotax.dat);
+  let rtd = $derived(allotax.rtd);
+  let barData = $derived(allotax.barData);
+  let maxlog10 = $derived(allotax.maxlog10);
+  let max_shift = $derived(allotax.max_shift);
 
   // Interactive highlighting state
   let highlightedTerm = $state(null);

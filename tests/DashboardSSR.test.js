@@ -1,50 +1,40 @@
 import { expect, test, describe, beforeAll } from 'vitest';
 import { render } from 'svelte/server';
 import fs from 'fs';
-import * as d3 from 'd3';
 
 describe('Full Pipeline Integration', () => {
-  let combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, balanceDat, Dashboard;
+  let Allotaxonograph, Dashboard;
   let testData1, testData2;
-  
+
   beforeAll(async () => {
     // Import everything from SSR build (since both have the same exports)
     const module = await import('../dist/ssr/index.js');
-    combElems = module.combElems;
-    rank_turbulence_divergence = module.rank_turbulence_divergence;
-    diamond_count = module.diamond_count;
-    wordShift_dat = module.wordShift_dat;
-    balanceDat = module.balanceDat;
+    Allotaxonograph = module.Allotaxonograph;
     Dashboard = module.Dashboard;
-    
+
     // Load real data from JSON files
     const boys1895 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1895.json', 'utf8'));
     const boys1968 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1968.json', 'utf8'));
-    
+
     testData1 = boys1895;
     testData2 = boys1968;
   });
 
   test('data processing pipeline completes successfully', () => {
     const alpha = 0.17;
-    
-    const me = combElems(testData1, testData2);
-    expect(me).toBeDefined();
-    expect(me[0]).toHaveProperty('ranks');
-    expect(me[1]).toHaveProperty('ranks');
-    
-    const rtd = rank_turbulence_divergence(me, alpha);
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
+
+    const rtd = instance.rtd;
     expect(rtd).toHaveProperty('normalization');
     expect(rtd).toHaveProperty('divergence_elements');
-    
-    const dat = diamond_count(me, rtd);
+
+    const dat = instance.dat;
     expect(dat).toHaveProperty('counts');
     expect(dat).toHaveProperty('deltas');
-    
-    const barData = wordShift_dat(me, dat);
-    expect(Array.isArray(barData)).toBe(true);
-    
-    const balanceData = balanceDat(testData1, testData2);
+
+    expect(Array.isArray(instance.barData)).toBe(true);
+
+    const balanceData = instance.balanceData;
     expect(Array.isArray(balanceData)).toBe(true);
     expect(balanceData.length).toBeGreaterThan(0);
   });
@@ -53,33 +43,20 @@ describe('Full Pipeline Integration', () => {
     const alpha = 0.17;
     const title1 = "Boys Names 1968";
     const title2 = "Boys Names 2018";
-    
-    // Process data
-    const me = combElems(testData1, testData2);
-    const rtd = rank_turbulence_divergence(me, alpha);
-    const dat = diamond_count(me, rtd);
-    const diamond_dat = dat.counts;
-    
-    const maxlog10 = Math.ceil(Math.max(
-      Math.log10(Math.max(...me[0].ranks)),
-      Math.log10(Math.max(...me[1].ranks))
-    ));
-    
-    const max_count_log = Math.ceil(Math.log10(d3.max(diamond_dat, d => d.value))) + 1;
-    const barData = wordShift_dat(me, dat).slice(0, 30);
-    const balanceData = balanceDat(testData1, testData2);
-    
+
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
+
     // Render Dashboard
     const result = render(Dashboard, {
       props: {
-        dat,
+        dat: instance.dat,
         alpha,
-        divnorm: rtd.normalization,
-        barData,
-        balanceData,
+        divnorm: instance.rtd.normalization,
+        barData: instance.barData,
+        balanceData: instance.balanceData,
         title: [title1, title2],
-        maxlog10,
-        max_count_log,
+        maxlog10: instance.maxlog10,
+        max_count_log: instance.max_count_log,
         height: 815,
         width: 1200,
         DiamondHeight: 600,
@@ -96,33 +73,83 @@ describe('Full Pipeline Integration', () => {
     });
 
     expect(result.body).toContain('allotaxonometer-dashboard');
-    // These might fail if components aren't rendering, so let's test one by one
-    // expect(result.body).toContain('diamond-chart');
-    // expect(result.body).toContain('wordshift-container');
-    // expect(result.body).toContain('balance-chart');
-    // expect(result.body).toContain('legend-container');
+  });
+
+  test('dashboard renders with canonical (flat) Rust/Python shape', () => {
+    // Simulate the shape returned by `allotax.compute_allotax(...)` from the
+    // Python binding (or the equivalent Rust API): a flat object with
+    // `diamond_counts`, `wordshift`, `balance`, `normalization`, etc.
+    const alpha = 0.17;
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
+
+    const flatResult = {
+      diamond_counts: instance.dat.counts,
+      ncells: instance.dat.ncells,
+      wordshift: instance.barData,
+      balance: instance.balanceData,
+      normalization: instance.rtd.normalization,
+      max_delta_loss: instance.dat.max_delta_loss,
+      maxlog10: instance.maxlog10,
+      alpha,
+    };
+
+    const result = render(Dashboard, {
+      props: {
+        ...flatResult,
+        title: ['Boys Names 1895', 'Boys Names 1968'],
+        max_count_log: instance.max_count_log,
+        DiamondHeight: 600,
+      },
+    });
+
+    expect(result.body).toContain('allotaxonometer-dashboard');
+    // Sanity-check that the chart actually rendered cells (not an empty SVG).
+    expect(result.body).toMatch(/<rect/);
+  });
+
+  test('dashboard renders when spreading Allotaxonograph directly', () => {
+    // Sanity-check that <Dashboard {...allotax} /> still works after the
+    // canonical/legacy alias split. Allotaxonograph exposes both shapes.
+    const alpha = 0.17;
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
+
+    // Manually spread the fields the way Svelte's spread would.
+    const result = render(Dashboard, {
+      props: {
+        dat: instance.dat,
+        diamond_counts: instance.diamond_counts,
+        ncells: instance.ncells,
+        wordshift: instance.wordshift,
+        balance: instance.balance,
+        normalization: instance.normalization,
+        barData: instance.barData,
+        balanceData: instance.balanceData,
+        divnorm: instance.divnorm,
+        maxlog10: instance.maxlog10,
+        max_count_log: instance.max_count_log,
+        alpha,
+        DiamondHeight: 600,
+      },
+    });
+
+    expect(result.body).toContain('allotaxonometer-dashboard');
+    expect(result.body).toMatch(/<rect/);
   });
 
   test('generates complete visual test', () => {
     const alpha = 0.17;
     const title1 = "Boys Names 1968";
     const title2 = "Boys Names 2018";
-    
-    // Process data
-    const me = combElems(testData1, testData2);
-    const rtd = rank_turbulence_divergence(me, alpha);
-    const dat = diamond_count(me, rtd);
+
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
+    const rtd = instance.rtd;
+    const dat = instance.dat;
     const diamond_dat = dat.counts;
-    
-    const maxlog10 = Math.ceil(Math.max(
-      Math.log10(Math.max(...me[0].ranks)),
-      Math.log10(Math.max(...me[1].ranks))
-    ));
-    
-    const max_count_log = Math.ceil(Math.log10(d3.max(diamond_dat, d => d.value))) + 1;
-    const barData = wordShift_dat(me, dat).slice(0, 30);
-    const balanceData = balanceDat(testData1, testData2);
-    
+    const maxlog10 = instance.maxlog10;
+    const max_count_log = instance.max_count_log;
+    const barData = instance.barData;
+    const balanceData = instance.balanceData;
+
     // Render Dashboard
     const result = render(Dashboard, {
       props: {

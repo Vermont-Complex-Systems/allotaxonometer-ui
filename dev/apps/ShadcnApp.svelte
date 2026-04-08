@@ -4,8 +4,7 @@
     import { toggleMode } from "mode-watcher";
     import SunIcon from "@lucide/svelte/icons/sun";
     import MoonIcon from "@lucide/svelte/icons/moon";
-    import { Dashboard } from 'allotaxonometer-ui';
-    import { combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, balanceDat } from 'allotaxonometer-ui';
+    import { Dashboard, Allotaxonograph } from 'allotaxonometer-ui';
     import { Slider } from "$lib/components/ui/slider/index.js";
     import { Button } from "$lib/components/ui/button/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
@@ -75,17 +74,19 @@
         }
     }
 
-    // Data processing
-    let me = $derived(sys1 && sys2 ? combElems(sys1, sys2) : null);
-    let rtd = $derived(me ? rank_turbulence_divergence(me, alpha) : null);
-    let dat = $derived(me && rtd ? diamond_count(me, rtd) : null);
-    
-    let barData = $derived(me && dat ? wordShift_dat(me, dat).slice(0, 30) : []);
-    let balanceData = $derived(sys1 && sys2 ? balanceDat(sys1, sys2) : []);
-    let maxlog10 = $derived(me ? Math.ceil(d3.max([Math.log10(d3.max(me[0].ranks)), Math.log10(d3.max(me[1].ranks))])) : 0);
-    let max_count_log = $derived(dat ? Math.ceil(Math.log10(d3.max(dat.counts, d => d.value))) + 1 : 2);
-    let max_shift = $derived(barData.length > 0 ? d3.max(barData, d => Math.abs(d.metric)) : 1);
-    let isDataReady = $derived(dat && barData && balanceData && me && rtd);
+    // Single reactive state container — runs the full pipeline (WASM if available, JS fallback otherwise).
+    const allotax = new Allotaxonograph(sys1, sys2, { alpha, topN: 30 });
+    $effect(() => { allotax.updateData(sys1, sys2); });
+    $effect(() => { allotax.alpha = alpha; });
+
+    let dat = $derived(allotax.dat);
+    let rtd = $derived(allotax.rtd);
+    let barData = $derived(allotax.barData);
+    let balanceData = $derived(allotax.balanceData);
+    let maxlog10 = $derived(allotax.maxlog10);
+    let max_count_log = $derived(allotax.max_count_log);
+    let max_shift = $derived(allotax.max_shift);
+    let isDataReady = $derived(allotax.isDataReady);
 </script>
 
 <ModeWatcher />
@@ -202,7 +203,7 @@
                             </div>
                             {#if isDataReady}
                                 <div class="text-xs text-muted-foreground mt-4">
-                                    <div>Items: {me[0].ranks.length}</div>
+                                    <div>Items: {allotax.rtd?.divergence_elements?.length ?? 0}</div>
                                     <div>Divergence: {rtd.normalization.toFixed(4)}</div>
                                 </div>
                             {/if}

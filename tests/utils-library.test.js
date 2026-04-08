@@ -4,13 +4,13 @@ import fs from 'fs';
 
 describe('Utils Library Functions Integration', () => {
   let matlab_sort, rin, rank_maxlog10, tiedrank, which, zeros, getUnions, setdiff;
-  let combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, balanceDat;
+  let combElems, Allotaxonograph;
   let testData1, testData2;
-  
+
   beforeAll(async () => {
     // Import everything from compiled library (same as your pattern)
     const module = await import('../dist/index.js');
-    
+
     // Extract utils functions from library
     matlab_sort = module.matlab_sort;
     rin = module.rin;
@@ -20,18 +20,17 @@ describe('Utils Library Functions Integration', () => {
     zeros = module.zeros;
     getUnions = module.getUnions;
     setdiff = module.setdiff;
-    
-    // Also get the main pipeline functions for integration testing
+
+    // Helpers still exposed publicly
     combElems = module.combElems;
-    rank_turbulence_divergence = module.rank_turbulence_divergence;
-    diamond_count = module.diamond_count;
-    wordShift_dat = module.wordShift_dat;
-    balanceDat = module.balanceDat;
-    
+
+    // Modern reactive pipeline entry point
+    Allotaxonograph = module.Allotaxonograph;
+
     // Load real test data
     const boys1968 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1968.json', 'utf8'));
     const boys2018 = JSON.parse(fs.readFileSync('tests/fixtures/boys-2018.json', 'utf8'));
-    
+
     testData1 = boys1968;
     testData2 = boys2018;
   });
@@ -187,32 +186,35 @@ describe('Utils Library Functions Integration', () => {
     
     test('utils performance in full pipeline', () => {
       const alpha = 0.58;
-      
-      console.time('Full pipeline with utils');
-      const me = combElems(testData1, testData2);
-      const rtd = rank_turbulence_divergence(me, alpha);
-      const dat = diamond_count(me, rtd);
-      const barData = wordShift_dat(me, dat);
-      const balanceData = balanceDat(testData1, testData2);
-      console.timeEnd('Full pipeline with utils');
-      
-      expect(me).toBeDefined();
+
+      console.time('Full pipeline with Allotaxonograph');
+      const instance = new Allotaxonograph(testData1, testData2, { alpha });
+      const dat = instance.dat;
+      const rtd = instance.rtd;
+      const barData = instance.barData;
+      const balanceData = instance.balanceData;
+      const maxlog10 = instance.maxlog10;
+      console.timeEnd('Full pipeline with Allotaxonograph');
+
       expect(rtd).toBeDefined();
       expect(dat).toBeDefined();
       expect(Array.isArray(barData)).toBe(true);
       expect(Array.isArray(balanceData)).toBe(true);
-      
-      // Test rank_maxlog10 calculation with real data
-      const maxlog10 = rank_maxlog10(me);
+
       expect(maxlog10).toBeGreaterThan(0);
       expect(Number.isInteger(maxlog10)).toBe(true);
+
+      // tiedrank still drives ranking inside combElems — verify directly
+      const me = combElems(testData1, testData2);
+      const directMaxlog10 = rank_maxlog10(me);
+      expect(directMaxlog10).toBe(maxlog10);
     });
 
     test('delta_sum vs normalization — are they the same?', () => {
       const alpha = 0.58;
-      const me = combElems(testData1, testData2);
-      const rtd = rank_turbulence_divergence(me, alpha);
-      const dat = diamond_count(me, rtd);
+      const instance = new Allotaxonograph(testData1, testData2, { alpha });
+      const dat = instance.dat;
+      const rtd = instance.rtd;
 
       // delta_sum: what the math formula displays
       const delta_sum = dat.deltas.reduce((a, b) => a + b, 0);

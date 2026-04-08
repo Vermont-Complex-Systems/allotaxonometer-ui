@@ -22,7 +22,14 @@
 
     // Extract data from dat object
     let diamond_dat = $derived(dat.counts);
-    let deltas = $derived(dat.deltas);
+
+    // Total cells per row.
+    // Prefer the value emitted by the pipeline (`dat.ncells`) which works for
+    // both sparse (Rust/WASM, Python compute_allotax) and dense (JS fallback)
+    // grids. Fall back to scanning the cells when callers haven't set it.
+    let ncells = $derived(
+        dat.ncells ?? ((d3.max(diamond_dat, d => d.x1) ?? 0) + 1)
+    );
 
     // Calculate derived dimensions (matching D3 version exactly)
     let innerHeight = $derived(DiamondHeight - marginInner);
@@ -45,8 +52,8 @@
     }
 
     function get_relevant_types(diamond_dat) {
-        const ncells = d3.max(diamond_dat, d => d.x1);
-        const cumbin = d3.range(0, ncells, 1.5);
+        const localNcells = d3.max(diamond_dat, d => d.x1);
+        const cumbin = d3.range(0, localNcells, 1.5);
         const relevant_types = [];
 
         // Count how often each type appears across all cells (for selectivity)
@@ -102,16 +109,18 @@
         relevant_types ? diamond_dat.filter(d => filter_labs(d, relevant_types)).length : 0
     );
     
-    // Wrangling data
-    let ncells = $derived(d3.max(diamond_dat, d => d.x1));
-    let max_rank = $derived(d3.max(diamond_dat, (d) => d.rank_L[1]));
-    let rounded_max_rank = $derived(10**Math.ceil(Math.log10(max_rank)));
+    // Wrangling data — use `maxlog10` directly so we don't have to scan
+    // every cell's `rank_L` extent (which doesn't exist on sparse grids).
+    let rounded_max_rank = $derived(10 ** maxlog10);
     let xyDomain = $derived([1, rounded_max_rank]);
-    
-    // Scales (matching D3 version dimensions)
-    let xy = $derived(d3.scaleBand().domain(diamond_dat.map(d => d.y1)).range([0, diamondHeight]));
+
+    // Scales (matching D3 version dimensions).
+    // The band scale's domain must enumerate every column/row index, so we
+    // use `d3.range(ncells)` instead of `diamond_dat.map(d => d.y1)` — the
+    // latter only contained populated rows when the grid is sparse.
+    let xy = $derived(d3.scaleBand().domain(d3.range(ncells)).range([0, diamondHeight]));
     let logScale = $derived(d3.scaleLog().domain(xyDomain).range([0, innerHeight]).nice());
-    let linScale = $derived(d3.scaleLinear().domain([0, ncells-1]).range([0, innerHeight]));
+    let linScale = $derived(d3.scaleLinear().domain([0, ncells - 1]).range([0, innerHeight]));
     let wxy = $derived(d3.scaleBand().domain(d3.range(ncells)).range([0, innerHeight]));
     
     let color_scale = $derived(d3.scaleSequentialLog().domain([rounded_max_rank, 1]).interpolator(d3.interpolateInferno));

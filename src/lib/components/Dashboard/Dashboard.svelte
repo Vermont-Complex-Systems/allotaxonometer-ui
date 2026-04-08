@@ -7,14 +7,29 @@
   import { alloColors, alloFonts } from '../../utils/aesthetics.js';
 
   interface DashboardProps {
-    // Updated data props (new API)
-    dat?: any;                    // Main data object containing counts, deltas, etc.
-    alpha?: number;
-    divnorm?: number;             // Replaces rtd
-    barData?: any[];
-    balanceData?: any[];          // Pre-calculated balance data
+    // -------- Canonical data shape (matches the Rust/Python output of
+    //          `compute_allotax`). Prefer these for new code; they let you
+    //          spread the result of `allotax.compute_allotax(...)` directly:
+    //              <Dashboard {...result_data} alpha={alpha} />
+    diamond_counts?: any[];       // Sparse cells from Rust core
+    ncells?: number;              // Total cells per row of the diamond grid
+    wordshift?: any[];            // Wordshift entries
+    balance?: any[];              // Balance entries
+    normalization?: number;       // RTD normalization factor (= D_alpha denom)
+    max_delta_loss?: number;      // Carried for completeness; unused by render
+    delta_sum?: number;           // Carried for completeness; unused by render
 
-    // Configuration props
+    // -------- Legacy / nested shape (still accepted for backward compat).
+    //          `Allotaxonograph` exposes these names, and per-stage scrolly
+    //          callers may already build them by hand. Canonical names take
+    //          precedence when both are passed.
+    dat?: any;                    // { counts, deltas, max_delta_loss, ncells }
+    barData?: any[];              // alias of `wordshift`
+    balanceData?: any[];          // alias of `balance`
+    divnorm?: number;             // alias of `normalization`
+
+    // -------- Shared props (no rename across shapes)
+    alpha?: number;
     title?: string[];
     maxlog10?: number;
     height?: number;
@@ -24,8 +39,8 @@
     DiamondHeight?: number;
     DiamondWidth?: number;
     WordshiftWidth?: number;
-    marginInner?: number;         // Replaces margin.inner
-    marginDiamond?: number;       // Replaces margin.diamond
+    marginInner?: number;
+    marginDiamond?: number;
     max_count_log?: number;       // For legend
     xDomain?: [number, number]; // Optional x-axis domain for Wordshift
     labelThreshold?: number;      // Maximum number of types per cell to show labels in Diamond
@@ -45,11 +60,19 @@
   }
 
   let {
-    dat = null,
+    // Canonical
+    diamond_counts = undefined,
+    ncells = undefined,
+    wordshift = undefined,
+    balance = undefined,
+    normalization = undefined,
+    // Legacy aliases
+    dat = undefined,
+    barData = undefined,
+    balanceData = undefined,
+    divnorm = undefined,
+    // Shared
     alpha = 0.58,
-    divnorm = 1,
-    barData = [],
-    balanceData = [],
     xDomain = undefined,
     instrumentText = 'Instrument: Rank-Turbulence Divergence',
     title = ['System 1', 'System 2'],
@@ -67,9 +90,30 @@
     labelThreshold = Infinity,
   }: DashboardProps = $props();
 
+  // -------- Normalize: canonical first, fall back to legacy. ----------
+  // Children consume the legacy `dat`/`barData`/`balanceData`/`divnorm` shape
+  // so we synthesize a `dat` object when the caller only passed canonical
+  // (flat) props. The reverse fallback keeps existing call sites working.
+  let effective_diamond_counts = $derived(
+    diamond_counts ?? dat?.counts ?? []
+  );
+  let effective_ncells = $derived(ncells ?? dat?.ncells);
+  let effective_wordshift = $derived(wordshift ?? barData ?? []);
+  let effective_balance = $derived(balance ?? balanceData ?? []);
+  let effective_normalization = $derived(normalization ?? divnorm ?? 1);
+
+  // Synthetic `dat` for <Diamond>/<Legend>. When the caller already passed a
+  // legacy `dat`, prefer it (preserves any extra fields like `deltas`).
+  let datForChildren = $derived(
+    dat ?? {
+      counts: effective_diamond_counts,
+      ncells: effective_ncells,
+    }
+  );
+
   let max_shift = $derived(
-    barData.length > 0
-      ? Math.max(...barData.map(d => Math.abs(d.metric)))
+    effective_wordshift.length > 0
+      ? Math.max(...effective_wordshift.map(d => Math.abs(d.metric)))
       : 1
   );
 
@@ -94,7 +138,9 @@
 
       <div id="diamondplot">
             <Diamond
-              {dat} {alpha} {divnorm} {title} {maxlog10}
+              dat={datForChildren}
+              {alpha} {title} {maxlog10}
+              divnorm={effective_normalization}
               {DiamondHeight} {marginInner} {marginDiamond}
               {labelThreshold}
             />
@@ -104,14 +150,14 @@
       <div style="display: flex; gap: 13em; justify-content: center;">
         <div id="legend" style="margin-left: -50px;">
               <Legend
-                diamond_dat={dat.counts}
+                diamond_dat={effective_diamond_counts}
                 DiamondHeight={DiamondHeight}
                 max_count_log={max_count_log || 5}
               />
         </div>
         <div id="balance">
               <DivergingBarChart
-                data={balanceData}
+                data={effective_balance}
                 DiamondHeight={DiamondHeight}
                 DiamondWidth={DiamondWidth}
               />
@@ -123,7 +169,7 @@
     <div style="margin-top:60px; overflow: visible;">
       <div id="wordshift" style="overflow: visible;">
             <Wordshift
-              barData={barData}
+              barData={effective_wordshift}
               DashboardHeight={DashboardHeight}
               DashboardWidth={DashboardWidth}
               xDomain={wordshiftXDomain}

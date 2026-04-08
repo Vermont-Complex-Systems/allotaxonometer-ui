@@ -3,84 +3,63 @@ import fs from 'fs';
 import * as d3 from 'd3';
 
 describe('Dashboard Client-Side Integration (Simple)', () => {
-  let combElems, rank_turbulence_divergence, diamond_count, wordShift_dat, balanceDat, Dashboard;
+  let Allotaxonograph, Dashboard;
   let testData1, testData2;
-  
+
   beforeAll(async () => {
     // Import everything from client build
     const module = await import('../dist/index.js');
-    combElems = module.combElems;
-    rank_turbulence_divergence = module.rank_turbulence_divergence;
-    diamond_count = module.diamond_count;
-    wordShift_dat = module.wordShift_dat;
-    balanceDat = module.balanceDat;
+    Allotaxonograph = module.Allotaxonograph;
     Dashboard = module.Dashboard;
-    
+
     // Load real data from JSON files
     const boys1968 = JSON.parse(fs.readFileSync('tests/fixtures/boys-1968.json', 'utf8'));
     const boys2018 = JSON.parse(fs.readFileSync('tests/fixtures/boys-2018.json', 'utf8'));
-    
+
     testData1 = boys1968;
     testData2 = boys2018;
   });
 
-  test('can import all required functions from client build', () => {
-    expect(combElems).toBeDefined();
-    expect(rank_turbulence_divergence).toBeDefined();
-    expect(diamond_count).toBeDefined();
-    expect(wordShift_dat).toBeDefined();
-    expect(balanceDat).toBeDefined();
+  test('can import Allotaxonograph and Dashboard from client build', () => {
+    expect(Allotaxonograph).toBeDefined();
+    expect(typeof Allotaxonograph).toBe('function');
     expect(Dashboard).toBeDefined();
     expect(typeof Dashboard).toBe('function');
   });
 
   test('client-side data processing pipeline works correctly', () => {
-    const alpha = 0.58; // Using the same alpha as in your example
-    
-    // Test combElems
-    const me = combElems(testData1, testData2);
-    expect(me).toBeDefined();
-    expect(Array.isArray(me)).toBe(true);
-    expect(me.length).toBe(2);
-    expect(me[0]).toHaveProperty('ranks');
-    expect(me[1]).toHaveProperty('ranks');
-    expect(Array.isArray(me[0].ranks)).toBe(true);
-    expect(Array.isArray(me[1].ranks)).toBe(true);
-    
-    // Test rank_turbulence_divergence
-    const rtd = rank_turbulence_divergence(me, alpha);
+    const alpha = 0.58;
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
+
+    const rtd = instance.rtd;
     expect(rtd).toBeDefined();
     expect(rtd).toHaveProperty('normalization');
     expect(rtd).toHaveProperty('divergence_elements');
     expect(typeof rtd.normalization).toBe('number');
     expect(Array.isArray(rtd.divergence_elements)).toBe(true);
-    
-    // Test diamond_count
-    const dat = diamond_count(me, rtd);
+
+    const dat = instance.dat;
     expect(dat).toBeDefined();
     expect(dat).toHaveProperty('counts');
     expect(dat).toHaveProperty('deltas');
     expect(Array.isArray(dat.counts)).toBe(true);
     expect(Array.isArray(dat.deltas)).toBe(true);
-    
-    // Test wordShift_dat
-    const barData = wordShift_dat(me, dat);
+
+    const barData = instance.barData;
     expect(Array.isArray(barData)).toBe(true);
     expect(barData.length).toBeGreaterThan(0);
-    
-    // Test first few items have expected structure
+
     if (barData.length > 0) {
       expect(barData[0]).toHaveProperty('metric');
       expect(barData[0]).toHaveProperty('type');
       expect(typeof barData[0].metric).toBe('number');
       expect(typeof barData[0].type).toBe('string');
     }
-    
-    // Test balanceDat
-    const balanceData = balanceDat(testData1, testData2);
+
+    const balanceData = instance.balanceData;
     expect(Array.isArray(balanceData)).toBe(true);
     expect(balanceData.length).toBeGreaterThan(0);
-    
+
     if (balanceData.length > 0) {
       expect(balanceData[0]).toHaveProperty('frequency');
       expect(balanceData[0]).toHaveProperty('y_coord');
@@ -89,36 +68,23 @@ describe('Dashboard Client-Side Integration (Simple)', () => {
 
   test('derived calculations match expected patterns', () => {
     const alpha = 0.58;
-    
-    const me = combElems(testData1, testData2);
-    const rtd = rank_turbulence_divergence(me, alpha);
-    const dat = diamond_count(me, rtd);
-    const barData = wordShift_dat(me, dat).slice(0, 30); // Same as your example
-    const balanceData = balanceDat(testData1, testData2);
-    
-    // Test maxlog10 calculation (like in your example)
-    const maxlog10 = Math.ceil(d3.max([
-      Math.log10(d3.max(me[0].ranks)), 
-      Math.log10(d3.max(me[1].ranks))
-    ]));
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
+
+    const maxlog10 = instance.maxlog10;
     expect(maxlog10).toBeGreaterThan(0);
     expect(Number.isInteger(maxlog10)).toBe(true);
-    
-    // Test max_count_log calculation
-    const max_count_log = Math.ceil(Math.log10(d3.max(dat.counts, d => d.value))) + 1;
+
+    const max_count_log = instance.max_count_log;
     expect(max_count_log).toBeGreaterThan(1);
     expect(Number.isInteger(max_count_log)).toBe(true);
-    
-    // Test max_shift calculation
-    const max_shift = barData.length > 0 ? d3.max(barData, d => Math.abs(d.metric)) : 1;
+
+    const max_shift = instance.max_shift;
     expect(max_shift).toBeGreaterThan(0);
-    
-    // Test delta_sum calculation (like in your math display)
-    const delta_sum = d3.sum(rtd.divergence_elements);
+
+    const delta_sum = d3.sum(instance.rtd.divergence_elements);
     expect(typeof delta_sum).toBe('number');
     expect(delta_sum).toBeGreaterThan(0);
-    
-    // Test title array (like in your example)
+
     const title = ['Boys 2022', 'Boys 2023'];
     expect(Array.isArray(title)).toBe(true);
     expect(title.length).toBe(2);
@@ -132,42 +98,29 @@ describe('Dashboard Client-Side Integration (Simple)', () => {
     const DiamondWidth = DiamondHeight;
     const marginInner = 160;
     const marginDiamond = 40;
-    
-    const me = combElems(testData1, testData2);
-    const rtd = rank_turbulence_divergence(me, alpha);
-    const dat = diamond_count(me, rtd);
-    const barData = wordShift_dat(me, dat).slice(0, 30);
-    const balanceData = balanceDat(testData1, testData2);
-    
-    const maxlog10 = Math.ceil(d3.max([
-      Math.log10(d3.max(me[0].ranks)), 
-      Math.log10(d3.max(me[1].ranks))
-    ]));
-    const max_count_log = Math.ceil(Math.log10(d3.max(dat.counts, d => d.value))) + 1;
-    const max_shift = barData.length > 0 ? d3.max(barData, d => Math.abs(d.metric)) : 1;
+
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
     const title = ['Boys 2022', 'Boys 2023'];
-    
-    // Construct props object exactly like in your example
+
     const dashboardProps = {
-      dat,
+      dat: instance.dat,
       alpha,
-      divnorm: rtd?.normalization || 1,
-      barData,
-      balanceData,
+      divnorm: instance.divnorm || 1,
+      barData: instance.barData,
+      balanceData: instance.balanceData,
       title,
-      maxlog10,
-      max_count_log,
+      maxlog10: instance.maxlog10,
+      max_count_log: instance.max_count_log,
       height: DashboardHeight,
       width: DashboardWidth,
       DiamondHeight,
       DiamondWidth,
       marginInner,
       marginDiamond,
-      xDomain: [-max_shift * 1.5, max_shift * 1.5],
+      xDomain: instance.xDomain,
       class: "dashboard"
     };
-    
-    // Verify all props are defined
+
     expect(dashboardProps.dat).toBeDefined();
     expect(dashboardProps.alpha).toBe(alpha);
     expect(dashboardProps.divnorm).toBeGreaterThan(0);
@@ -186,7 +139,7 @@ describe('Dashboard Client-Side Integration (Simple)', () => {
   test('alpha slider values work correctly', () => {
     // Test the alpha range from your example
     const alphas = d3.range(0,18).map(v => +(v/12).toFixed(2)).concat([1, 2, 5, Infinity]);
-    
+
     expect(Array.isArray(alphas)).toBe(true);
     expect(alphas.length).toBeGreaterThan(18);
     expect(alphas.includes(0)).toBe(true);
@@ -194,35 +147,28 @@ describe('Dashboard Client-Side Integration (Simple)', () => {
     expect(alphas.includes(2)).toBe(true);
     expect(alphas.includes(5)).toBe(true);
     expect(alphas.includes(Infinity)).toBe(true);
-    
+
     // Test that a few different alphas work in the pipeline (avoid problematic values)
-    const testAlphas = [0.17, 0.58, 1.0, 1.5]; // Removed 2.0 and higher values that might be slow
-    const me = combElems(testData1, testData2);
-    
+    const testAlphas = [0.17, 0.58, 1.0, 1.5];
+
     for (const alpha of testAlphas) {
-      const rtd = rank_turbulence_divergence(me, alpha);
-      const dat = diamond_count(me, rtd);
-      
-      expect(rtd).toBeDefined();
-      expect(dat).toBeDefined();
-      expect(rtd.normalization).toBeGreaterThan(0);
-      expect(Array.isArray(dat.counts)).toBe(true);
+      const instance = new Allotaxonograph(testData1, testData2, { alpha });
+      expect(instance.rtd).toBeDefined();
+      expect(instance.dat).toBeDefined();
+      expect(instance.rtd.normalization).toBeGreaterThan(0);
+      expect(Array.isArray(instance.dat.counts)).toBe(true);
     }
   }, 10000); // Increase timeout to 10 seconds
 
   test('generates simple test output file', () => {
     const alpha = 0.58;
-    const me = combElems(testData1, testData2);
-    const rtd = rank_turbulence_divergence(me, alpha);
-    const dat = diamond_count(me, rtd);
-    const barData = wordShift_dat(me, dat).slice(0, 30);
-    const balanceData = balanceDat(testData1, testData2);
-    
-    const maxlog10 = Math.ceil(d3.max([
-      Math.log10(d3.max(me[0].ranks)), 
-      Math.log10(d3.max(me[1].ranks))
-    ]));
-    const max_count_log = Math.ceil(Math.log10(d3.max(dat.counts, d => d.value))) + 1;
+    const instance = new Allotaxonograph(testData1, testData2, { alpha });
+    const rtd = instance.rtd;
+    const dat = instance.dat;
+    const barData = instance.barData;
+    const balanceData = instance.balanceData;
+    const maxlog10 = instance.maxlog10;
+    const max_count_log = instance.max_count_log;
     const delta_sum = d3.sum(rtd.divergence_elements);
     
     const html = `

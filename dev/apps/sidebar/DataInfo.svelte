@@ -1,7 +1,7 @@
 <script>
     import { Accordion } from "bits-ui";
     
-    let { title, me, rtd, isDataReady } = $props();
+    let { title, itemCount, rtd, isDataReady } = $props();
 </script>
 
 <Accordion.Item value="info" class="accordion-item">
@@ -26,7 +26,7 @@
                 <div class="stats">
                     <div class="stat">
                         <span class="stat-label">Items</span>
-                        <span class="stat-value">{me[0].ranks.length.toLocaleString()}</span>
+                        <span class="stat-value">{(itemCount ?? 0).toLocaleString()}</span>
                     </div>
                     <div class="stat">
                         <span class="stat-label">Divergence</span>
