@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "allotax-core"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2c7e39acb88292a9fccb5c16a8ec0371cad974737daa2c3078acb87297c75ce"
+checksum = "be405514bcd0f79c0427b8001b6cb8afccd202ed8752c20a36de8bbd4e0a6cd6"
 dependencies = [
  "rayon",
  "serde",
