@@ -53,17 +53,19 @@
 
     // Helper function matching D3 logic exactly
     function parseLabelData(label) {
-        const splitIndex = label.indexOf(' ');
+        // Split on the opening paren to separate the name from the rank info.
+        // This handles multi-word types like bigrams ("of the (1 ⇋ 2)").
+        const parenIndex = label.indexOf('(');
         let name_y, numbers_y;
-        if (splitIndex === -1) {
+        if (parenIndex === -1) {
             name_y = label;
             numbers_y = "";
         } else {
-            name_y = label.slice(0, splitIndex);
-            numbers_y = label.slice(splitIndex + 1).trim();
-            // Strip first and last characters from numbers_y if possible
-            if (numbers_y.length > 2) {
-                numbers_y = numbers_y.slice(1, numbers_y.length - 1);
+            name_y = label.slice(0, parenIndex).trim();
+            numbers_y = label.slice(parenIndex + 1).trim();
+            // Strip trailing ')' if present
+            if (numbers_y.endsWith(')')) {
+                numbers_y = numbers_y.slice(0, -1);
             }
         }
         return { name_y, numbers_y };
